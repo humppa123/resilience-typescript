@@ -1,0 +1,29 @@
+{
+  "defaultSeverity": "warning",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "ordered-imports": false,
+    "arrow-parens": false,
+    "object-literal-sort-keys": false,
+    "interface-over-type-literal": false,
+    "member-access": false,
+    "variable-name": false,
+    "class-name": false,
+    "no-console": false,
+    "trailing-comma": false,
+    "forin": false,
+    "max-line-length": false,
+    "no-shadowed-variable": false,
+    "member-ordering": false,
+    "object-literal-shorthand": false,
+    "prefer-for-of": false,
+    "max-classes-per-file": false
+  },
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": []
+  }
+}

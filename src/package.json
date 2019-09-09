@@ -1,0 +1,44 @@
+{
+  "name": "@srs/resilience",
+  "version": "0.1.0",
+  "description": "TBD",
+  "homepage": "https://apps-munichre.visualstudio.com/Mirage/_wiki/wikis/Mirapply.wiki?wikiVersion=GBwikiMaster&pagePath=%2FMirage%2FRisk%20Assessment%20Solution%20Team&pageId=1067",
+  "repository": {
+    "type": "git",
+    "url": "https://apps-munichre@dev.azure.com/apps-munichre/Mirage/_git/Ras.Schema"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/tsc",
+    "test": "node_modules/.bin/_mocha dist/**/*.spec.js --reporter=mocha-multi-reporters --reporter-options configFile=reporter-config.json",
+    "build-test": "npm run build && npm run test",
+    "copy-package": "copy package.json dist\\package.json /Y",
+    "dist": "npm version patch && npm copy-package && cd dist && npm publish"
+  },
+  "keywords": [
+    "Resilience",
+    "Timeout",
+    "Retry",
+    "Token Cache",
+    "Circuit Breaker"
+  ],
+  "author": "Fabian Schwarz",
+  "license": "MIT",
+  "dependencies": {
+    "applicationinsights": "^1.4.1",
+    "axios": "^0.19.0",
+    "querystring": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.1",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.4",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^6.2.0",
+    "mocha-junit-reporter": "^1.23.1",
+    "mocha-multi-reporters": "^1.1.7",
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.2"
+  }
+}

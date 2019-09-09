@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "es6"
+    ],
+    "types": [
+      "chai",
+      "mocha",
+      "node"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "removeComments": false,
+    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "app/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules", 
+    "dist"
+  ]
+}
