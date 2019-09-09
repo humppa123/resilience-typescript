@@ -2,7 +2,7 @@
 
 ## TODO
 
-* Test for Token Cache (has no cached, has cached valid, has cached expired, has chached edge case one minute)
+* Test for Token Cache (has chached edge case one minute)
 * Circuit Breaker
 * Circuit Breaker unit tests
 * Combined Handler (Pipeline?!?)
