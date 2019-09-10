@@ -94,21 +94,3 @@ There are also three predefined logger already included:
 * `ConsoleLogger`: A logger that writes every log message independent of its log level to the console.
 * `NoLogger`: A logger that does nothing, it basically disables all logging.
 * `TestLogger`: A logger that's primary designed for unit tests where you can provide a callback that will be called for each log message, to test if and what log messages are generated.
-
-## TODO
-
-* Circuit Breaker
-* Circuit Breaker unit tests
-* Logger must be able to have multiple implementatis (console + appnsinghts)
-* Combined Handler (Pipeline?!?)
-* Combined Handler Builder
-* ICache
-* MemoryCache
-* RedisCache
-* Axios Integration
-* Axios Request Builder
-* Simple Axios Request Builder
-* Documentation
-  * Diagrams a la Circuit Breaker for all Resilience and Combined handler
-* Gitlab NPM registry
-* Publish to Github, push automatically from local Gitlab
