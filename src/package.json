@@ -19,7 +19,8 @@
     "Timeout",
     "Retry",
     "Token Cache",
-    "Circuit Breaker"
+    "Circuit Breaker",
+    "Cache"
   ],
   "author": "Fabian Schwarz",
   "license": "MIT",

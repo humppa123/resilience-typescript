@@ -29,7 +29,7 @@ describe("Resilence", () => {
             const retry = new RetryProxy(retries, new NoLogger());
             const expectedRetries = 11;
             let i = 0;
-            const successOnSecondTry = async () => {
+            const successOnLastTry = async () => {
                 if (i < expectedRetries) {
                     i++;
                     throw new Error(errorMessage);
@@ -39,7 +39,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await retry.execute(successOnSecondTry);
+            const result = await retry.execute(successOnLastTry);
 
             // Assert
             expect(result).to.equal(successMessage);
