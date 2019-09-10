@@ -48,15 +48,52 @@ try {
 
 ### Token Cache
 
-A cache that stores `Bearer` tokens and 
+A component that uses an implementation of the `ITokenProvider` interface to request a **Bearer** authorization token. As long as this token does not expire, it will be added automatically to all subsequent web calls `Authorization` header. If the token expires, a new one will be automatically requested. A default implementation is available with the `DefaultTokenCache` class.
+
+![tokenCache](./.media/tokencache.png)
 
 #### ITokenProvider
 
+You can easily add your own authorization provider, by implementing the `ITokenProvider` provider where you request a token in any format and convert it to the general `Token` class:
 
+```typescript
+    /**
+     * Gets an access token.
+     * @returns An access token.
+     */
+    getToken(): Promise<Token>;
+```
 
 #### Azure Active Directory App Registration Token Provider
 
+There's been already added a token provider for an Azure Active Directory App Registration. You'll need to provide the following information:
+
+* `baseUrl`: Base URL for the token endpoint. Most of the time you'll be fine with <https://login.microsoftonline.com>
+* `clientId`: The GUID of your app registration. You can find this in the Azure portal.
+* `clientSecret`: A secret you've created for your app registration in the Azure portal.
+* `tenantId`: The GUID of your Azure Active Directory. You can find this also in the Azure portal.
+* `logger`: An implementation of the `ILogger<TState>` interface. You can find more information in the [Logging](#logging) section.
+
+```typescript
+const baseUrl = "https://login.microsoftonline.com";
+const clientId = "YOUR_CLIENT_ID";
+const clientSecret = "YOUR_CLIENT_SECRET";
+const tenantId = "YOUR_TENANT_ID";
+const logger: ILogger<string> = new NoLogger();
+const provider: ITokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrl, clientId, clientSecret, tenantId, logger);
+
+const result = await provider.getToken(); // A valid token for Bearer authorization that can be used by a token cache.
+```
+
 ### Logging
+
+This package contains its own logging mechanism but you can easily include your own logger by extending the `AbstractStringLogger` class, implementing the `protected abstract logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void;` method and calling your own logger inside of it.
+
+There are also three predefined logger already included:
+
+* `ConsoleLogger`: A logger that writes every log message independent of its log level to the console.
+* `NoLogger`: A logger that does nothing, it basically disables all logging.
+* `TestLogger`: A logger that's primary designed for unit tests where you can provide a callback that will be called for each log message, to test if and what log messages are generated.
 
 ## TODO
 
