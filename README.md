@@ -2,6 +2,8 @@
 
 ![icon](./.media/icon.png)
 
+[![pipeline status](https://git.silverraven.eu/silver-raven-software/resilience-typescript/badges/master/pipeline.svg)](https://git.silverraven.eu/silver-raven-software/resilience-typescript/commits/master) [![coverage report](https://git.silverraven.eu/silver-raven-software/resilience-typescript/badges/master/coverage.svg)](https://git.silverraven.eu/silver-raven-software/resilience-typescript/commits/master)
+
 SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like **Timeout**, **Retry**, **Circuit Breaker**, **Cache**, **Token Cache** to outgoing HTTP(S) calls, built on top of the [Axios](https://github.com/axios/axios) library with a fluent language. Primary designed for backend to backend communication.
 
 ## Quickstart
