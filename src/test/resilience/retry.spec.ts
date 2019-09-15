@@ -8,11 +8,12 @@ const expect = chai.expect;
 
 describe("Resilence", () => {
     describe("Retry", () => {
+        const logger = new NoLogger();
         it("Should throw retry exception if retry count is exceeded", async () => {
             // Arrange
             const errorMessage = "This is the inner exception";
             const retries = 7;
-            const retry = new RetryProxy(retries, new NoLogger());
+            const retry = new RetryProxy(retries, logger);
             const fails = async () => {
                 throw new Error(errorMessage);
             };
@@ -26,7 +27,7 @@ describe("Resilence", () => {
             const errorMessage = "This is the inner exception";
             const successMessage = "This is a success!";
             const retries = 13;
-            const retry = new RetryProxy(retries, new NoLogger());
+            const retry = new RetryProxy(retries, logger);
             const expectedRetries = 11;
             let i = 0;
             const successOnLastTry = async () => {
@@ -48,11 +49,10 @@ describe("Resilence", () => {
         it("Should succeed on first successful try", async () => {
             // Arrange
             const successMessage = "This is a success!";
-            const count = 13;
             const expectedRetries = 1;
             const retries = 1;
             let i = 0;
-            const retry = new RetryProxy(retries, new NoLogger());
+            const retry = new RetryProxy(retries, logger);
             const successOnFirstTry = async () => {
                 i++;
                 return successMessage;

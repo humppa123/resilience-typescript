@@ -3,11 +3,14 @@ import { ILogger } from "../logging/logger";
 import { Guard } from "../utils/guard";
 import { logFormatter } from "../resilience/utils";
 import { CacheError } from "./cacheError";
+import { IQueue } from "./queue";
+import { MemoryQueue } from "./memoryQueue";
+import { ArgumentError } from "../utils/argumentError";
 
 /**
  * A cache that stores its values in memory with a sliding expiration.
  */
-export class MemoryCache implements ICache {
+export class MemoryCache<TResult> implements ICache<string, TResult> {
     /**
      * Value in milli seconds how long a value is valid in the cache.
      */
@@ -19,7 +22,7 @@ export class MemoryCache implements ICache {
     /**
      * Dictionary for the memory cache values.
      */
-    private readonly cacheValues: { [id: string]: any; } = {};
+    private readonly cacheValues: { [id: string]: TResult; } = {};
     /**
      * Dictionary for the expiration dates in the memory cache.
      */
@@ -28,6 +31,10 @@ export class MemoryCache implements ICache {
      * Specifies after how many requests to the cache the garbage collection will take place.
      */
     private readonly garbageCollectEveryXRequests: number;
+    /**
+     * Data field for the queue.
+     */
+    private readonly queue: IQueue<string>;
     /**
      * The current counter for the garbage collection.
      */
@@ -38,24 +45,36 @@ export class MemoryCache implements ICache {
      * @param expirationTimespanMs Value in milli seconds how long a value is valid in the cache.
      * @param logger The logger to use.
      * @param garbageCollectEveryXRequests Specifies after how many requests to the cache the garbage collection will take place.
+     * @param maxEntryCount Number of maximum entries that can be stored at the same time in the memory cache.
      */
-    constructor(expirationTimespanMs: number, logger: ILogger<string>, garbageCollectEveryXRequests: number = 50) {
+    constructor(expirationTimespanMs: number, logger: ILogger<string>, garbageCollectEveryXRequests: number = 50, maxEntryCount: number = 1000) {
         Guard.throwIfNullOrEmpty(expirationTimespanMs, "expirationTimespanMs");
         Guard.throwIfNullOrEmpty(logger, "logger");
         Guard.throwIfNullOrEmpty(garbageCollectEveryXRequests, "garbageCollectEveryXRequests");
+        Guard.throwIfNullOrEmpty(maxEntryCount, "maxEntryCount");
+
+        if (garbageCollectEveryXRequests <= 0) {
+            throw new ArgumentError("'garbageCollectEveryXRequests' must be greater than zero.", "garbageCollectEveryXRequests");
+        }
+
+        if (maxEntryCount <= 0) {
+            throw new ArgumentError("'maxEntryCount' must be greater than zero.", "maxEntryCount");
+        }
 
         this.expirationTimespanMs = expirationTimespanMs;
         this.logger = logger;
         this.garbageCollectEveryXRequests = garbageCollectEveryXRequests;
         this.garbageCounter = 1;
+        this.queue = new MemoryQueue(maxEntryCount, logger);
     }
 
     /**
      * Executes a function within a cache. If the value is in the cache and has not expired, it will be returned from the cache, else it will be queried from the func and added to the cache.
      * @param func Function to get the value if not in cache or has expired.
      * @param key The key to use for this value.
+     * @returns The result of the provided function.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, key?: string): Promise<TResult> {
+    public async execute(func: (...args: any[]) => Promise<TResult>, key?: string): Promise<TResult> {
         this.garbageCounter++;
         this.garbageCollect();
         if (!key) {
@@ -65,18 +84,15 @@ export class MemoryCache implements ICache {
         }
 
         this.logger.trace(`Starting MemoryCache for key '${key}'`, null, logFormatter);
-        if (this.isAlreadyInCache(key) && !!this.hasExpired(key)) {
-            this.logger.debug(`Returning value for key '${key}' in MemoryCache.`, null, logFormatter);
-            const result = this.cacheValues.key;
+        if (this.isAlreadyInCache(key) && !this.hasExpired(key)) {
+            const result = this.retrieve(key);
             return result;
         } else {
             try {
                 const result = await func();
                 const expires = new Date();
                 expires.setMilliseconds(expires.getMilliseconds() + this.expirationTimespanMs);
-                this.cacheExpirations.key = expires;
-                this.cacheValues.key = result;
-                this.logger.debug(`Storing value for key '${key}' in MemoryCache with expiration '${expires.toISOString()}'.`, null, logFormatter);
+                this.insert(key, result, expires);
                 this.logger.debug(`Returning value for key '${key}' in MemoryCache.`, null, logFormatter);
                 return result;
             } catch (e) {
@@ -88,11 +104,53 @@ export class MemoryCache implements ICache {
     }
 
     /**
+     * Gets the length of items currently stored in the cache.
+     */
+    public length(): number {
+        let i = 0;
+        for (const item in this.cacheExpirations) {
+            if (this.cacheExpirations[item]) {
+                i++;
+            }
+        }
+
+        return i;
+    }
+
+    /**
+     * Inserts a value into the cache.
+     * @param key Key in the cache for new value.
+     * @param value Value to insert.
+     * @param expires Exipration timestamp for new cache entry.
+     */
+    public insert(key: string, value: TResult, expires: Date): void {
+        this.cacheExpirations[key] = expires;
+        this.cacheValues[key] = value;
+        this.logger.debug(`Storing value for key '${key}' in MemoryCache with expiration '${expires.toISOString()}'.`, null, logFormatter);
+        const queueResult = this.queue.push(key);
+        if (queueResult.hasPoped) {
+            this.remove(queueResult.popedItem, false);
+        }
+    }
+
+    /**
+     * Retrieves a value from the cache.
+     * @param key Key of value to get.
+     * @returns The value for a key.
+     */
+    public retrieve(key: string): TResult {
+        this.logger.debug(`Returning value for key '${key}' in MemoryCache.`, null, logFormatter);
+        const result = this.cacheValues[key];
+        return result;
+    }
+
+    /**
      * Gets a value indicating whether a key is already included.
      * @param key Key to check for.
+     * @returns True if a key is already in the cache, else false.
      */
     public isAlreadyInCache(key: string): boolean {
-        if (this.cacheValues.key && this.cacheExpirations.key) {
+        if (this.cacheValues[key] && this.cacheExpirations[key]) {
             return true;
         } else {
             this.logger.debug(`Key '${key}' is not in MemoryCache`, null, logFormatter);
@@ -103,10 +161,11 @@ export class MemoryCache implements ICache {
     /**
      * Gets a value indicating whether a key has already expired.
      * @param key Key to check for.
+     * @returns True if a key has already expired, else false.
      */
     public hasExpired(key: string): boolean {
         const now = new Date().getTime();
-        const value = this.cacheExpirations.key;
+        const value = this.cacheExpirations[key];
         const expires = value.getTime();
         if (expires < now) {
             this.logger.debug(`Key '${key}' in MemoryCache has already expired on '${value.toISOString()}'`, null, logFormatter);
@@ -118,8 +177,9 @@ export class MemoryCache implements ICache {
 
     /**
      * Removes all items from the cache that have already expired.
+     * @returns Number of items removed from the cache.
      */
-    public garbageCollect(): void {
+    public garbageCollect(): number {
         if (this.garbageCounter % this.garbageCollectEveryXRequests === 0) {
             this.logger.trace(`Starting garbage collection for MemoryCache.`, null, logFormatter);
             const toRemove: string[] = [];
@@ -130,12 +190,28 @@ export class MemoryCache implements ICache {
             }
 
             for (const key of toRemove) {
-                this.logger.trace(`Removing key '${key}' from MemoryCache.`, null, logFormatter);
-                this.cacheExpirations.key = null;
-                this.cacheValues.key = null;
+                this.remove(key, true);
             }
 
+            this.logger.trace(`MemoryCache garbage collection removed '${toRemove.length}' items from the cache.`, null, logFormatter);
             this.garbageCounter = 1;
+            return toRemove.length;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Removes an item from the cache.
+     * @param key Key of the item to remove from the cache.
+     * @param removeFromQueue Flag if value should also be removed from the queue.
+     */
+    private remove(key: string, removeFromQueue: boolean): void {
+        this.logger.trace(`Removing key '${key}' from MemoryCache.`, null, logFormatter);
+        this.cacheExpirations[key] = null;
+        this.cacheValues[key] = null;
+        if (removeFromQueue) {
+            this.queue.remove(key);
         }
     }
 }

@@ -4,16 +4,18 @@ import { TimeoutError } from "../../app/resilience/timeoutError";
 import { sleepAndReject } from "../../app/resilience/utils";
 import { TimeoutProxy } from "../../app/resilience/timeoutProxy";
 import { NoLogger } from "../../app/logging/noLogger";
+import { TimeSpansInMilleSeconds } from "../../app/utils/timespans";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("Resilence", () => {
     describe("Timeout", () => {
+        const logger = new NoLogger();
         it("Should throw timeout exception if timeout is faster than func", async () => {
             // Arrange
-            const timeSpan = 200;
-            const timeout = new TimeoutProxy(timeSpan, new NoLogger());
-            const sleep = 100;
+            const timeSpan = TimeSpansInMilleSeconds.TwoHundredMilliSeconds;
+            const timeout = new TimeoutProxy(timeSpan, logger);
+            const sleep = TimeSpansInMilleSeconds.OneHundredMilliSeconds;
 
             // Act
             // Assert
@@ -22,8 +24,8 @@ describe("Resilence", () => {
         it("Should succeed if func is faster than timeout", async () => {
             // Arrange
             const successMessage = "This is a success!";
-            const timeSpan = 500;
-            const timeout = new TimeoutProxy(timeSpan, new NoLogger());
+            const timeSpan = TimeSpansInMilleSeconds.FiveHundredMilliSeconds;
+            const timeout = new TimeoutProxy(timeSpan, logger);
             const fasterHarderScooter = async (): Promise<string> => {
                 return successMessage;
             };
@@ -37,8 +39,8 @@ describe("Resilence", () => {
         it("Should throw TimeoutException if func crashed", async () => {
             // Arrange
             const errorMessage = "This is an error!";
-            const timeSpan = 500;
-            const timeout = new TimeoutProxy(timeSpan, new NoLogger());
+            const timeSpan = TimeSpansInMilleSeconds.FiveHundredMilliSeconds;
+            const timeout = new TimeoutProxy(timeSpan, logger);
             const fasterHarderScooter = async (): Promise<string> => {
                 throw new Error(errorMessage);
             };

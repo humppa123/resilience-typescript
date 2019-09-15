@@ -2,10 +2,10 @@
   "name": "@srs/resilience",
   "version": "0.1.0",
   "description": "TBD",
-  "homepage": "https://apps-munichre.visualstudio.com/Mirage/_wiki/wikis/Mirapply.wiki?wikiVersion=GBwikiMaster&pagePath=%2FMirage%2FRisk%20Assessment%20Solution%20Team&pageId=1067",
+  "homepage": "https://git.silverraven.eu/silver-raven-software/resilience-typescript",
   "repository": {
     "type": "git",
-    "url": "https://apps-munichre@dev.azure.com/apps-munichre/Mirage/_git/Ras.Schema"
+    "url": "https://git.silverraven.eu/silver-raven-software/resilience-typescript"
   },
   "scripts": {
     "build": "node_modules/.bin/tsc",
@@ -25,7 +25,6 @@
   "author": "Fabian Schwarz",
   "license": "MIT",
   "dependencies": {
-    "applicationinsights": "^1.4.1",
     "axios": "^0.19.0",
     "querystring": "^0.2.0"
   },
