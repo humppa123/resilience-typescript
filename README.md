@@ -48,6 +48,10 @@ try {
 }
 ```
 
+### Circuit Breaker
+
+![circuitbreaker](./.media/circuitbreaker.png)
+
 ### Token Cache
 
 A component that uses an implementation of the `ITokenProvider` interface to request a **Bearer** authorization token. As long as this token does not expire, it will be added automatically to all subsequent web calls `Authorization` header. If the token expires, a new one will be automatically requested. A default implementation is available with the `DefaultTokenCache` class.
