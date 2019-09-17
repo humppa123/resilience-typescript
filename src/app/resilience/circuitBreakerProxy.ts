@@ -8,7 +8,7 @@ import { logFormatter } from "./utils";
 /**
  * A circuit breaker to protect a caller from failing resources.
  */
-export class CircuitBreaker implements IResilienceProxy {
+export class CircuitBreakerProxy implements IResilienceProxy {
     /**
      * Gets a callback to invoke if internal state has changed.
      */
@@ -131,9 +131,9 @@ export class CircuitBreaker implements IResilienceProxy {
         try {
             result = await func();
             success = true;
+            this.currentFailedCalls = 0;
             this.logger.debug(`Func in Circuit Breaker called succesfully.`, null, logFormatter);
             if (wasHalfOpen) {
-                this.currentFailedCalls = 0;
                 this.updateState(CircuitBreakerState.Close);
             }
         } catch (e) {

@@ -12,6 +12,26 @@ TODO
 
 ## Components
 
+### Pipeline
+
+A pipeline of so called resilience proxies (like Timeout, Retry and Circuit Breaker) that allows you to chain components together. You can build for instance a highly resilient pipeline were a Timeout is followed by a retry, whose is followed then by a Circuit Breaker.
+
+![pipeline](./.media/pipeline.png)
+
+```typescript
+const proxies: IResilienceProxy[] = [];
+// Circuit Breaker calls Retry calls Timeout calls func
+proxies.push(new CircuitBreakerProxy()); // Constructor is missing parameters for demonstration purpose!
+proxies.push(new RetryProxy()); // Constructor is missing parameters for demonstration purpose!
+proxies.push(new TimeoutProxy()); // Constructor is missing parameters for demonstration purpose!
+const successMessage = "This is a success!";
+const pipeline = new PipelineProxy(proxies);
+const func = async () => {...}; // An async function that does the real work and must be resolved within the pipeline
+
+// Executes func in timeout, then timeout result in retry, then the result of retry in circuit breaker.
+const result = await pipeline.execute(func);
+```
+
 ### Timeout
 
 Checks if a promise resolves within a given timespan in ms. If not, it fails with a `TimeoutError`.
@@ -53,6 +73,20 @@ try {
 Allows a func to fail a configurable times before failing fast on a subsequent func call. On failure a `CircuitBreakerError` will be thrown with the `innerError` property containing the real error.
 
 ![circuitbreaker](./.media/circuitbreaker.png)
+
+```typescript
+// Arrange
+const breakDuration = TimeSpansInMilleSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
+const maxFailedCalls = 5; // Circuit breaker will go into open state after five failed calls.
+const logger = new NoLogger(); // Empty logger, see Logging chapter.
+const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null);
+const func = async () => {...}; // An async function that does the real work
+try {
+    const result = await circuitBreaker.execute(func); // Executes the provided func at most three times if it fails.
+} catch (e) {
+    console.log(e.message); // A CircuitBreakerError, its "innerException" contains the real error.
+}
+```
 
 ### Token Cache
 
