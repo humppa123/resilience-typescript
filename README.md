@@ -99,8 +99,76 @@ There are also three predefined logger already included:
 
 ### Cache
 
+An interface to provide a caching mechanism to not always query a depended service. A default implementation is provided with the `MemoryCache`. You can easily create your own implementation by implementing the following interface:
+
+```typescript
+export interface ICache<TKey, TResult> {
+    /**
+     * Executes a function within a cache. If the value is in the cache and has not expired, it will be returned from the cache, else it will be queried from the func and added to the cache.
+     * @param func Function to get the value if not in cache or has expired.
+     * @param key The key to use for this value.
+     */
+    execute(func: (...args: any[]) => Promise<TResult>, key?: TKey): Promise<TResult>;
+}
+```
+
 #### Memory Cache
+
+A default implementation of a cache that stores all values in memory. To minimze memory usage, you can specify a sliding expiration of cache entries whereas garbage collection will take place on every configurable call to the cache. Also you can limit the maximum number of items in the cache.  
+
+![memory](./.media/memorycache.png)
+
+```typescript
+const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneHour; // Cache entries are expire after one hour
+const garbageCollectEveryXRequests = 100; // Removing of expired items will take place every 100 calls to the 'execute' function
+const maxEntryCount = 500; // Cache holds 500 entries maximum. If more are added, the oldest will be removed.
+const key = "KeyForFunc"; // The key for the result of the func. Must be provided.
+const func = async () => {...}; // An async function that does the real work and whose result will be stored in the cache if not already present.
+const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, garbageCollectEveryXRequests, maxEntryCount);
+try {
+    const result = await cache.execute(func, key); // Returns a value from the cache if present or executes the func to get the value and stores it in the cache under the given key.
+} catch (e) {
+    console.log(e.message); // A CacheError, its "innerException" contains the real error.
+}
+```
 
 ### Queue
 
+An interface to provide a queue in TypeScript, it is used in the `MemoryCache` to limit the maximum count of entries in the cache. A default implementation is provided with the `MemoryQueue`.
+
+```typescript
+/**
+ * A queue with a defined maximum lenght.
+ */
+export interface IQueue<T> {
+    /**
+     * The maximum length of the queue.
+     */
+    readonly maxLength: number;
+
+    /**
+     * Adds a new item to the beginning of the queue.
+     * @param value The item to add at the beginning of thequeue.
+     * @returns An object describing whether a pop was required to add the item to the queue.
+     */
+    push(value: string): QueuePushResult<T>;
+
+    /**
+     * Removes the last item from the queue.
+     * @returns The removed item of undefined.
+     */
+    pop(): T | undefined;
+}
+```
+
 #### Memory Queue
+
+A simple default implementation of a queue to limit the maximum count entries in the `MemoryCache`.
+
+```typescript
+const maxLength = 100; // Maximum size of the queue is 100 entries.
+const queue = new MemoryQueue(maxLength, logger);
+const result = queue.push("First"); // Adds a new entry to the queue.
+const hasPoped = result.hasPoped; // Gets a value if a value was removed from the queue due to the size limit of the queue has reached.
+const popedItem = result.popedItem; // Gets the value that was removed from the queue due to the size limit if any.
+```
