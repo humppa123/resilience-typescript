@@ -1,6 +1,6 @@
 import { IResilienceProxy } from "../resilience/resilienceProxy";
 import { Guard } from "../utils/guard";
-import { PipelineItem } from "./PipelineItem";
+import { PipelineItem } from "./pipelineItem";
 
 /**
  * A pipeline that combies multiple resilience proxies.
