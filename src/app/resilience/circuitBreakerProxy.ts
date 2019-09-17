@@ -48,8 +48,9 @@ export class CircuitBreaker implements IResilienceProxy {
      * @param maxFailedCalls Maximum failed calls before opening the circuit breaker.
      * @param logger Logger to use.
      * @param stateChangedCallback Callback to invoke if internal state has changed.
+     * @param initialState The initial state of the circuit breaker.
      */
-    constructor(breakDurationMs: number, maxFailedCalls: number, logger: ILogger<string>, stateChangedCallback?: (state: CircuitBreakerState) => void) {
+    constructor(breakDurationMs: number, maxFailedCalls: number, logger: ILogger<string>, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close) {
         Guard.throwIfNullOrEmpty(breakDurationMs, "breakDurationMs");
         Guard.throwIfNullOrEmpty(maxFailedCalls, "maxFailedCalls");
         Guard.throwIfNullOrEmpty(logger, "logger");
@@ -59,8 +60,11 @@ export class CircuitBreaker implements IResilienceProxy {
         this.maxFailedCalls = maxFailedCalls;
         this.logger = logger;
 
-        this.state = CircuitBreakerState.Close;
+        this.state = initialState;
         this.currentFailedCalls = 0;
+        this.openExpiration = new Date();
+        // Set to past to have a valid initial state.
+        this.openExpiration.setSeconds(this.openExpiration.getSeconds() - 5);
     }
 
     /**
@@ -101,9 +105,10 @@ export class CircuitBreaker implements IResilienceProxy {
                 }
 
             case CircuitBreakerState.Open:
-                const now = new Date();
-                if (now > this.openExpiration) {
-                    this.openExpiration = null;
+                const now = new Date().getTime();
+                const exp = this.openExpiration.getTime();
+                if (now > exp) {
+                    this.openExpiration = new Date();
                     this.updateState(CircuitBreakerState.HalfOpen);
                     return await this.execute(func);
                 } else {

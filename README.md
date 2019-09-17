@@ -50,6 +50,8 @@ try {
 
 ### Circuit Breaker
 
+Allows a func to fail a configurable times before failing fast on a subsequent func call. On failure a `CircuitBreakerError` will be thrown with the `innerError` property containing the real error.
+
 ![circuitbreaker](./.media/circuitbreaker.png)
 
 ### Token Cache
