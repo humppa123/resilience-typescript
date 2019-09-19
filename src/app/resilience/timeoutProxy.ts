@@ -9,7 +9,7 @@ import { logFormatter } from "./utils";
  */
 export class TimeoutProxy implements IResilienceProxy {
     /**
-     * Timeout in MS within function must succeed or else a timeout error is thrown.
+     * Timeout in milli seconds within function must succeed or else a timeout error is thrown.
      */
     private readonly timeoutMs: number;
     /**
@@ -19,7 +19,7 @@ export class TimeoutProxy implements IResilienceProxy {
 
     /**
      * Initializes a new instance of the @see TimeoutProxy class.
-     * @param retries Timeout in MS within function must succeed or else a timeout error is thrown.
+     * @param timeoutMs Timeout in milli seconds within function must succeed or else a timeout error is thrown.
      * @param logger Logger to use.
      */
     constructor(timeoutMs: number, logger: ILogger<string>) {
