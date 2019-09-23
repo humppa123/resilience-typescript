@@ -1,7 +1,7 @@
 import chai = require("chai");
 import chaiAsPromised = require("chai-as-promised");
 import { MemoryCache } from "../../app/caching/memoryCache";
-import { TimeSpansInMilleSeconds } from "../../app/utils/timespans";
+import { TimeSpansInMilliSeconds } from "../../app/utils/timespans";
 import { NoLogger } from "../../app/logging/noLogger";
 import { CacheError } from "../../app/caching/cacheError";
 chai.use(chaiAsPromised);
@@ -12,7 +12,7 @@ describe("Resilence", () => {
         const logger = new NoLogger();
         it("Should return false on unknown key in is already inserted check", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.ThirtyMinutes;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.ThirtyMinutes;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger);
             const key = "This should be unkown";
 
@@ -24,7 +24,7 @@ describe("Resilence", () => {
         });
         it("Should return true on known key in is already inserted check", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.ThirtyMinutes;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.ThirtyMinutes;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger);
             const key = "This should be know";
             const value = "This is the value!";
@@ -40,7 +40,7 @@ describe("Resilence", () => {
         });
         it("Should return correct value on known key", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.ThirtyMinutes;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.ThirtyMinutes;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger);
             const key = "This should be know";
             const value = "This is the value!";
@@ -56,7 +56,7 @@ describe("Resilence", () => {
         });
         it("Should return true if key has expired on expiration check", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneSecond;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneSecond;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger);
             const key = "This should be know";
             const value = "This is the value!";
@@ -72,7 +72,7 @@ describe("Resilence", () => {
         });
         it("Should return false if key has not expired on expiration check", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneMinute;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneMinute;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger);
             const key = "This should be know";
             const value = "This is the value!";
@@ -88,7 +88,7 @@ describe("Resilence", () => {
         });
         it("Should remove no entry on garbage collection if they have not expired.", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneDay;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneDay;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, 1);
             const value = "This is the value!";
             const expires = new Date();
@@ -109,7 +109,7 @@ describe("Resilence", () => {
         });
         it("Should remove entries on garbage collection if they have expired.", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneDay;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneDay;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, 1);
             const value = "This is the value!";
             const expires = new Date();
@@ -130,7 +130,7 @@ describe("Resilence", () => {
         });
         it("Should throw if no key is provided.", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneDay;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneDay;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, 1);
             const func = async () => {
                 return "Hallo123!";
@@ -142,7 +142,7 @@ describe("Resilence", () => {
         });
         it("If not in cache or expired func must be called and result of func returned.", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneDay;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneDay;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, 1);
             let called = 0;
             const key = "key";
@@ -162,7 +162,7 @@ describe("Resilence", () => {
         });
         it("If called several times func should be called just once.", async () => {
             // Arrange
-            const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneDay;
+            const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneDay;
             const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, 1);
             let called = 0;
             const key = "key";

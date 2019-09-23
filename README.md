@@ -1,14 +1,29 @@
 # SRS Resilience
 
-![icon](./.media/icon.png)
-
 [![pipeline status](https://git.silverraven.eu/silver-raven-software/resilience-typescript/badges/master/pipeline.svg)](https://git.silverraven.eu/silver-raven-software/resilience-typescript/commits/master) [![coverage report](https://git.silverraven.eu/silver-raven-software/resilience-typescript/badges/master/coverage.svg)](https://git.silverraven.eu/silver-raven-software/resilience-typescript/commits/master)
 
-SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like **Timeout**, **Retry**, **Circuit Breaker**, **Cache**, **Token Cache** to outgoing HTTP(S) calls, built on top of the [Axios](https://github.com/axios/axios) library with a fluent language. Primary designed for backend to backend communication.
+SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like **Timeout**, **Retry**, **Circuit Breaker**, **Cache**, **Token Cache** to outgoing HTTP(S) calls, built on top of the [Axios](https://github.com/axios/axios) library with a fluent language. Primarly designed for backend service to service communication.
+![icon](./.media/icon.png)
 
 ## Quickstart
 
 TODO
+
+## Builders
+
+### Resilient Pipeline Builder
+
+Allows you to create a customizable resilient pipeline, where you can chain e.g. a circuit breaker with a retry with a timeout. See the documentation for each component on how to set eachs parameters.
+
+```typescript
+const pipeline = ResilientPipelineBuilder
+    .New()
+    .addLogger(new ConsoleLogger())
+    .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
+    .useRetry(3, 3)
+    .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
+    .build();
+```
 
 ## Components
 
@@ -76,7 +91,7 @@ Allows a func to fail a configurable times before failing fast on a subsequent f
 
 ```typescript
 // Arrange
-const breakDuration = TimeSpansInMilleSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
+const breakDuration = TimeSpansInMilliSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
 const maxFailedCalls = 5; // Circuit breaker will go into open state after five failed calls.
 const logger = new NoLogger(); // Empty logger, see Logging chapter.
 const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null);
@@ -159,7 +174,7 @@ A default implementation of a cache that stores all values in memory. To minimze
 ![memory](./.media/memorycache.png)
 
 ```typescript
-const expirationTimeSpanMs = TimeSpansInMilleSeconds.OneHour; // Cache entries are expire after one hour
+const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneHour; // Cache entries are expire after one hour
 const garbageCollectEveryXRequests = 100; // Removing of expired items will take place every 100 calls to the 'execute' function
 const maxEntryCount = 500; // Cache holds 500 entries maximum. If more are added, the oldest will be removed.
 const key = "KeyForFunc"; // The key for the result of the func. Must be provided.

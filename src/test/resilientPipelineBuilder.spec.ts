@@ -3,7 +3,7 @@ import chaiAsPromised = require("chai-as-promised");
 import { ResilientPipelineBuilder } from "../app/resilientPipelineBuilder";
 import { NoLogger } from "../app/logging/noLogger";
 import { RetryProxy } from "../app/resilience/retryProxy";
-import { TimeSpansInMilleSeconds } from "../app/utils/timespans";
+import { TimeSpansInMilliSeconds } from "../app/utils/timespans";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -15,9 +15,9 @@ describe("Resilence", () => {
                 .New()
                 .addLogger(new NoLogger())
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
-                .useCircuitBreaker(2, TimeSpansInMilleSeconds.TenMinutes, 10)
+                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
-                .useTimeout(4, TimeSpansInMilleSeconds.OneHundredMilliSeconds)
+                .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
                 .build();
             const successMessage = "This is a success!";
             const func = async (): Promise<string> => {
@@ -36,9 +36,9 @@ describe("Resilence", () => {
                 .New()
                 .addLogger(new NoLogger())
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
-                .useCircuitBreaker(2, TimeSpansInMilleSeconds.TenMinutes, 10)
+                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
-                .useTimeout(4, TimeSpansInMilleSeconds.OneHundredMilliSeconds)
+                .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
                 .build();
             const errorMessage = "This is an error!";
             const func = async (): Promise<string> => {
@@ -59,7 +59,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            expect(() => pipeline.useCircuitBreaker(doubledPosition, TimeSpansInMilleSeconds.OneHundredMilliSeconds, 5)).to.throw();
+            expect(() => pipeline.useCircuitBreaker(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds, 5)).to.throw();
 
             // Cleanup
             done();
@@ -89,7 +89,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            expect(() => pipeline.useTimeout(doubledPosition, TimeSpansInMilleSeconds.OneHundredMilliSeconds)).to.throw();
+            expect(() => pipeline.useTimeout(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds)).to.throw();
 
             // Cleanup
             done();
@@ -100,7 +100,7 @@ describe("Resilence", () => {
             const pipeline = ResilientPipelineBuilder
                 .New()
                 .addLogger(new NoLogger())
-                .useTimeout(doubledPosition, TimeSpansInMilleSeconds.OneHundredMilliSeconds);
+                .useTimeout(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds);
 
             // Act
             // Assert
