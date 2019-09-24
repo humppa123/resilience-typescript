@@ -1,4 +1,4 @@
-import { IResilienceProxy } from "../resilience/resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 
 /**
  * An item in the resilience pipeline.

@@ -1,4 +1,4 @@
-import { QueuePushResult } from "./queuePushResult";
+import { QueuePushResult } from "../caching/queuePushResult";
 
 /**
  * A queue with a defined maximum lenght.

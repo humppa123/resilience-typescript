@@ -1,8 +1,8 @@
-import { ITokenCache } from "./tokenCache";
-import { ITokenProvider } from "./tokenProvider";
+import { ITokenCache } from "../contracts/tokenCache";
+import { ITokenProvider } from "../contracts/tokenProvider";
 import { Token } from "./token";
 import { Guard } from "../utils/guard";
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { logFormatter } from "../resilience/utils";
 
 /**

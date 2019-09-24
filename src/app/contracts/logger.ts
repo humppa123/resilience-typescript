@@ -1,4 +1,4 @@
-import { LogLevel } from "./logLevel";
+import { LogLevel } from "../logging/logLevel";
 
 /**
  * Represents a type used to perform logging.

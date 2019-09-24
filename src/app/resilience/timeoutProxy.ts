@@ -1,7 +1,7 @@
-import { IResilienceProxy } from "./resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { TimeoutError } from "./timeoutError";
 import { Guard } from "../utils/guard";
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { logFormatter } from "./utils";
 
 /**

@@ -1,4 +1,4 @@
-import { IResilienceProxy } from "../resilience/resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { Guard } from "../utils/guard";
 import { PipelineItem } from "./pipelineItem";
 

@@ -1,9 +1,9 @@
-import { ICache } from "./cache";
-import { ILogger } from "../logging/logger";
+import { ICache } from "../contracts/cache";
+import { ILogger } from "../contracts/logger";
 import { Guard } from "../utils/guard";
 import { logFormatter } from "../resilience/utils";
 import { CacheError } from "./cacheError";
-import { IQueue } from "./queue";
+import { IQueue } from "../contracts/queue";
 import { MemoryQueue } from "./memoryQueue";
 import { ArgumentError } from "../utils/argumentError";
 

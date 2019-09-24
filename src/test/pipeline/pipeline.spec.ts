@@ -1,6 +1,6 @@
 import chai = require("chai");
 import chaiAsPromised = require("chai-as-promised");
-import { IResilienceProxy } from "../../app/resilience/resilienceProxy";
+import { IResilienceProxy } from "../../app/contracts/resilienceProxy";
 import { PassThroughProxy } from "../../app/resilience/passThroughProxy";
 import { PipelineProxy } from "../../app/pipeline/pipelineProxy";
 import { ErrorProxy } from "../../app/resilience/errorProxy";

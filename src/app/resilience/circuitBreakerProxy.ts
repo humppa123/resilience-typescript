@@ -1,7 +1,7 @@
 import { CircuitBreakerState } from "./circuitBreakerState";
-import { IResilienceProxy } from "./resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { CircuitBreakerError } from "./circuitBreakerError";
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { Guard } from "../utils/guard";
 import { logFormatter } from "./utils";
 

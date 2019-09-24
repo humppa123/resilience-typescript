@@ -1,10 +1,10 @@
 import chai = require("chai");
 import * as TypeMoq from "typemoq";
 import chaiAsPromised = require("chai-as-promised");
-import { ITokenProvider } from "../../app/tokenCache/tokenProvider";
+import { ITokenProvider } from "../../app/contracts/tokenProvider";
 import { AzureActiveDirectoryAppRegistrationTokenProvider } from "../../app/tokenCache/azureAdAppRegistrationTokenProvider";
 import { Token } from "../../app/tokenCache/token";
-import { ITokenCache } from "../../app/tokenCache/tokenCache";
+import { ITokenCache } from "../../app/contracts/tokenCache";
 import { DefaultTokenCache } from "../../app/tokenCache/defaultTokenCache";
 import { NoLogger } from "../../app/logging/noLogger";
 chai.use(chaiAsPromised);

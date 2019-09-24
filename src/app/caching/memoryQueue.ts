@@ -1,6 +1,6 @@
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { QueuePushResult } from "./queuePushResult";
-import { IQueue } from "./queue";
+import { IQueue } from "../contracts/queue";
 import { logFormatter } from "../resilience/utils";
 
 /**

@@ -1,4 +1,4 @@
-import { IResilienceProxy } from "./resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 
 /**
  * A proxy for testing that passes the func only through.

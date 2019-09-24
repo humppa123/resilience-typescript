@@ -1,4 +1,4 @@
-import { Token } from "./token";
+import { Token } from "../tokenCache/token";
 
 /**
  * An access token provider.

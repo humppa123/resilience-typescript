@@ -1,7 +1,7 @@
 import { RetryError } from "./retryError";
-import { IResilienceProxy } from "./resilienceProxy";
+import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { Guard } from "../utils/guard";
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { logFormatter } from "./utils";
 
 /**

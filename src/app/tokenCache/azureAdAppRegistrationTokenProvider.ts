@@ -1,11 +1,11 @@
-import { ITokenProvider } from "./tokenProvider";
+import { ITokenProvider } from "../contracts/tokenProvider";
 import * as qs from "querystring";
 import Axios from "axios";
 import {AxiosRequestConfig } from "axios";
 import { Token } from "./token";
 import { Guard } from "../utils/guard";
 import { AzureAdAppRegistrationToken } from "./azureAdAppRegistrationToken";
-import { ILogger } from "../logging/logger";
+import { ILogger } from "../contracts/logger";
 import { logFormatter } from "../resilience/utils";
 
 /**

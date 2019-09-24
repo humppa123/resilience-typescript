@@ -1,5 +1,5 @@
 import { LogLevel } from "./logLevel";
-import { ILogger } from "./logger";
+import { ILogger } from "../contracts/logger";
 
 /**
  * Base class for all string loggers.

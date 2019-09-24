@@ -1,7 +1,7 @@
-import { IResilienceProxy } from "./resilience/resilienceProxy";
+import { IResilienceProxy } from "./contracts/resilienceProxy";
 import { Guard } from "./utils/guard";
 import { PipelineProxy } from "./pipeline/pipelineProxy";
-import { ILogger } from "./logging/logger";
+import { ILogger } from "./contracts/logger";
 import { NoLogger } from "./logging/noLogger";
 import { CircuitBreakerState } from "./resilience/circuitBreakerState";
 import { CircuitBreakerProxy } from "./resilience/circuitBreakerProxy";
