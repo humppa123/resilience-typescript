@@ -1,6 +1,6 @@
-# SRS Resilience
+# Resilience Typescript
 
-SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like **Timeout**, **Retry**, **Circuit Breaker**, **Cache**, **Token Cache** to outgoing HTTP(S) calls, built on top of the [Axios](https://github.com/axios/axios) library with a fluent language. Primarly designed for backend service to service communication.
+`resilience-typescript` is a Typescript resilience and transient-fault-handling library that allows developers to add components like **Timeout**, **Retry**, **Circuit Breaker**, **Cache**, **Token Cache** to outgoing HTTP(S) calls, built on top of the [Axios](https://github.com/axios/axios) library with a fluent language. Primarly designed for backend service to service communication.
 
 ![icon](./.media/icon.png)
 

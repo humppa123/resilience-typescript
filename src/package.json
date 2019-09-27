@@ -1,6 +1,6 @@
 {
-  "name": "@srs/resilience",
-  "version": "0.1.0",
+  "name": "resilience-typescript",
+  "version": "0.1.5",
   "description": "SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
   "keywords": [
     "Resilience",
@@ -23,8 +23,9 @@
     "build": "node_modules/.bin/tsc",
     "test": "node_modules/.bin/_mocha \"dist/**/*.spec.js\" --reporter=mocha-multi-reporters --reporter-options configFile=reporter-config.json",
     "build-test": "npm run build && npm run test",
+    "copy-readme": "copy ..\\..\\README.md .\\README.md /Y",
     "copy-package": "copy package.json dist\\package.json /Y",
-    "dist": "npm version patch && npm copy-package && cd dist && npm publish"
+    "dist": "npm run build-test && npm version patch && npm run copy-package && cd dist && npm run copy-readme && npm publish"
   },
   "dependencies": {
     "axios": "^0.19.0",
