@@ -1,19 +1,7 @@
 {
   "name": "@srs/resilience",
   "version": "0.1.0",
-  "description": "TBD",
-  "homepage": "https://git.silverraven.eu/silver-raven-software/resilience-typescript",
-  "repository": {
-    "type": "git",
-    "url": "https://git.silverraven.eu/silver-raven-software/resilience-typescript"
-  },
-  "scripts": {
-    "build": "node_modules/.bin/tsc",
-    "test": "node_modules/.bin/_mocha \"dist/**/*.spec.js\" --reporter=mocha-multi-reporters --reporter-options configFile=reporter-config.json",
-    "build-test": "npm run build && npm run test",
-    "copy-package": "copy package.json dist\\package.json /Y",
-    "dist": "npm version patch && npm copy-package && cd dist && npm publish"
-  },
+  "description": "SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
   "keywords": [
     "Resilience",
     "Timeout",
@@ -22,8 +10,22 @@
     "Circuit Breaker",
     "Cache"
   ],
-  "author": "Fabian Schwarz",
+  "homepage": "https://github.com/humppa123/resilience-typescript",
+  "bugs": "https://github.com/humppa123/resilience-typescript/issues",
   "license": "MIT",
+  "author": "Fabian Schwarz",
+  "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/humppa123/resilience-typescript"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/tsc",
+    "test": "node_modules/.bin/_mocha \"dist/**/*.spec.js\" --reporter=mocha-multi-reporters --reporter-options configFile=reporter-config.json",
+    "build-test": "npm run build && npm run test",
+    "copy-package": "copy package.json dist\\package.json /Y",
+    "dist": "npm version patch && npm copy-package && cd dist && npm publish"
+  },
   "dependencies": {
     "axios": "^0.19.0",
     "querystring": "^0.2.0"

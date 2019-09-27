@@ -23,7 +23,8 @@
   },
   "include": [
     "app/**/*.ts",
-    "test/**/*.ts"
+    "test/**/*.ts",
+    "index.ts"
   ],
   "exclude": [
     "node_modules", 
