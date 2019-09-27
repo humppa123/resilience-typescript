@@ -50,16 +50,17 @@ describe("Resilence", () => {
             // Arrange
             const accessToken = "This is the access token";
             const expires = new Date();
-            expires.setSeconds(expires.getSeconds() - 300);
+            expires.setSeconds(expires.getSeconds() + 300);
             const token = new Token(accessToken, expires);
-            const mock = TypeMoq.Mock.ofType<ITokenProvider>();
-            mock.setup(d => d.getToken()).returns(() => Promise.resolve(token));
-            const cache: ITokenCache = new DefaultTokenCache(mock.object, logger);
+            const mockProvider = TypeMoq.Mock.ofType<ITokenProvider>();
+            mockProvider.setup(d => d.getToken()).returns(() => Promise.resolve(token));
+            const cache: ITokenCache = new DefaultTokenCache(mockProvider.object, logger);
 
             // Act
             let result = await cache.getToken();
             result = await cache.getToken();
-            mock.verify(d => d.getToken(), TypeMoq.Times.once());
+            result = await cache.getToken();
+            mockProvider.verify(d => d.getToken(), TypeMoq.Times.once());
 
             // Assert
             expect(result.accessToken).to.equal(accessToken);

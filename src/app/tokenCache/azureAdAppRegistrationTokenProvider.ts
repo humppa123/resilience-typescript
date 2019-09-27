@@ -35,7 +35,7 @@ export class AzureActiveDirectoryAppRegistrationTokenProvider implements ITokenP
 
     /**
      * Initializes a new instance of the @see AzureActiveDirectoryAppRegistrationTokenProvider class.
-     * @param baseUrl The base URL for the token endpoint, e.g. 'https://login.microsoftonline.com'
+     * @param baseUrl The base URL for the token endpoint, e.g. 'https://login.microsoftonline.com'.
      * @param clientId The Id of the application registration.
      * @param clientSecret The secret for the application registration.
      * @param tenantId  The Id of the Azure Active Directory tenant.

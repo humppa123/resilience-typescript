@@ -10,5 +10,5 @@ export interface IResilienceWebProxy {
      * @param cacheKey Key for the cache if enabled.
      * @returns The result of the executed function.
      */
-    execute<TResult>(request: axios.AxiosRequestConfig, cacheKey?: string): Promise<axios.AxiosResponse<TResult>>
+    execute<TResult>(request: axios.AxiosRequestConfig, cacheKey?: string): Promise<axios.AxiosResponse<TResult>>;
 }

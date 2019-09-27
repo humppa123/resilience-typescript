@@ -56,9 +56,10 @@ export class DefaultTokenCache implements ITokenCache {
     public hasExpired(token: Token): boolean {
         const now = new Date().getTime();
         // We already get a new token if is less then a minute valid.
-        const expires = new Date();
-        expires.setSeconds(token.expires.getSeconds() + 60);
-        if (expires.getTime() < now) {
+        const expires = new Date(token.expires);
+        expires.setSeconds(expires.getSeconds() + 60);
+        const expiresTime = expires.getTime();
+        if (expiresTime > now) {
             return false;
         }
 

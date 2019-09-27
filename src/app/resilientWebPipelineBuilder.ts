@@ -11,6 +11,11 @@ import { IResilienceProxy } from "./contracts/resilienceProxy";
 import { WebPipelineProxy } from "./pipeline/webPipelineProxy";
 import { ArgumentError } from "./utils/argumentError";
 import { ITokenCache } from "./contracts/tokenCache";
+import { AzureActiveDirectoryAppRegistrationTokenProvider } from "./tokenCache/azureAdAppRegistrationTokenProvider";
+import { DefaultTokenCache } from "./tokenCache/defaultTokenCache";
+import { IResilienceCrudWebProxy } from "./contracts/resilienceCrudWebProxy";
+import { CrudWebPipelineProxy } from "./pipeline/crudWebPipelineProxy";
+import { FactoryWebPipelineProxy } from "./pipeline/factoryWebPipelineProxy";
 
 /**
  * A builder to create a resilient web pipeline.
@@ -60,6 +65,22 @@ export class ResilientWebPipelineBuilder {
      * Gets or sets the custom token cache.
      */
     private customTokenCache: ITokenCache;
+    /**
+     * Gets or sets the base URL for the token endpoint, e.g. 'https://login.microsoftonline.com'.
+     */
+    private aadBaseUrl: string;
+    /**
+     * Gets or sets the Id of the application registration.
+     */
+    private aadClientId: string;
+    /**
+     * Gets or sets the secret for the application registration.
+     */
+    private aadClientSecret: string;
+    /**
+     * Gets or sets the Id of the Azure Active Directory tenant.
+     */
+    private aadTenantId: string;
 
     /**
      * Initializes a new instance of the @see ResilientWebPipelineBuilder class.
@@ -87,27 +108,27 @@ export class ResilientWebPipelineBuilder {
      * @returns The web pipeline.
      */
     public build(): IResilienceWebProxy {
-        let pipeline: IResilienceProxy;
-        if (this.buildPipeline) {
-            this.pipelineBuilder.addLogger(this.logger);
-            pipeline = this.pipelineBuilder.build();
-        }
+        const build = this.prepareBuild();
+        return new WebPipelineProxy(build[0], build[1], build[2], build[3]);
+    }
 
-        let cache: ICache<string, axios.AxiosResponse>;
-        if (this.buildMemoryCache) {
-            cache = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, this.logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
-        } else {
-            cache = this.customCache;
-        }
+    /**
+     * Builds a CRUD web pipeline.
+     * @returns A CRUD web pipeline.
+     */
+    public buildToCrud<TItem>(): IResilienceCrudWebProxy<TItem> {
+        const build = this.prepareBuild();
+        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3]);
+    }
 
-        let tokenCache: ITokenCache;
-        if (this.buildAzureTokenProvider) {
-
-        } else {
-            tokenCache = this.customTokenCache;
-        }
-
-        return new WebPipelineProxy(pipeline, cache, tokenCache, this.baseUrl);
+    /**
+     * Builds a web request factory.
+     * @returns A web request factory.
+     */
+    public builtToRequestFactory(): FactoryWebPipelineProxy {
+        const build = this.prepareBuild();
+        const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3]);
+        return new FactoryWebPipelineProxy(proxy);
     }
 
     /**
@@ -125,10 +146,34 @@ export class ResilientWebPipelineBuilder {
     }
 
     /**
+     * Uses an Azure Active Directory App Registration token provider in a default token cache.
+     * @param baseUrl The base URL for the token endpoint, e.g. 'https://login.microsoftonline.com'.
+     * @param clientId The Id of the application registration.
+     * @param clientSecret The secret for the application registration.
+     * @param tenantId The Id of the Azure Active Directory tenant.
+     * @returns This builder.
+     */
+    public useAzureAdTokenProvider(baseUrl: string, clientId: string, clientSecret: string, tenantId: string): ResilientWebPipelineBuilder {
+        Guard.throwIfNullOrEmpty(baseUrl, "baseUrl");
+        Guard.throwIfNullOrEmpty(clientId, "clientId");
+        Guard.throwIfNullOrEmpty(clientSecret, "clientSecret");
+        Guard.throwIfNullOrEmpty(tenantId, "tenantId");
+
+        this.aadBaseUrl = baseUrl;
+        this.aadClientId = clientId;
+        this.aadClientSecret = clientSecret;
+        this.aadTenantId = tenantId;
+        this.buildAzureTokenProvider = true;
+
+        return this;
+    }
+
+    /**
      * Uses an in memory response cache.
      * @param expirationTimespanMs Value in milli seconds how long a value is valid in the cache.
      * @param garbageCollectEveryXRequests Specifies after how many requests to the cache the garbage collection will take place.
      * @param maxEntryCount Number of maximum entries that can be stored at the same time in the memory cache.
+     * @returns The builder.
      */
     public useMemoryCache(expirationTimespanMs: number, garbageCollectEveryXRequests: number = 50, maxEntryCount: number = 1000): ResilientWebPipelineBuilder {
         Guard.throwIfNullOrEmpty(expirationTimespanMs, "expirationTimespanMs");
@@ -238,5 +283,34 @@ export class ResilientWebPipelineBuilder {
         this.pipelineBuilder.useTimeout(position, timeoutMs);
 
         return this;
+    }
+
+    /**
+     * Builds the web pipeline.
+     * @returns The web pipeline.
+     */
+    private prepareBuild(): [IResilienceProxy, ICache<string, axios.AxiosResponse>, ITokenCache, string] {
+        let pipeline: IResilienceProxy;
+        if (this.buildPipeline) {
+            this.pipelineBuilder.addLogger(this.logger);
+            pipeline = this.pipelineBuilder.build();
+        }
+
+        let cache: ICache<string, axios.AxiosResponse>;
+        if (this.buildMemoryCache) {
+            cache = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, this.logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
+        } else {
+            cache = this.customCache;
+        }
+
+        let tokenCache: ITokenCache;
+        if (this.buildAzureTokenProvider) {
+            const provider = new AzureActiveDirectoryAppRegistrationTokenProvider(this.aadBaseUrl, this.aadClientId, this.aadClientSecret, this.aadTenantId, this.logger);
+            tokenCache = new DefaultTokenCache(provider, this.logger);
+        } else {
+            tokenCache = this.customTokenCache;
+        }
+
+        return [pipeline, cache, tokenCache, this.baseUrl];
     }
 }
