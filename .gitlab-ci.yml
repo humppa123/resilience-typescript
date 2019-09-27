@@ -11,6 +11,8 @@ build:
 test:
   stage: test
   script:
+    - 'npm --prefix src install'
+    - 'npm run --prefix src build'
     - 'npm --prefix src test'
   dependencies:
     - build
