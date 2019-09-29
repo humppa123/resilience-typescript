@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using test_backend.Models;
 
 namespace test_backend.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
     public class PersonsController : ControllerBase
@@ -19,16 +22,11 @@ namespace test_backend.Controllers
             new Person{ Id = 5, FirstName = "Clare", LastName = "Holman" }
         };
 
-        private readonly ILogger<PersonsController> _logger;
-
-        public PersonsController(ILogger<PersonsController> logger)
-        {
-            this._logger = logger;
-        }
-
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
+            PersonsController.FailRandomly();
+
             var person = PersonsController.TestData.FirstOrDefault(p => p.Id == id);
             if (person == null)
             {
@@ -42,12 +40,16 @@ namespace test_backend.Controllers
         [HttpGet]
         public IEnumerable<Person> Get()
         {
+            PersonsController.FailRandomly();
+
             return PersonsController.TestData;
         }
 
         [HttpGet("{id}")]
         public ActionResult<Person> Get(int id)
         {
+            PersonsController.FailRandomly();
+
             var person = PersonsController.TestData.FirstOrDefault(p => p.Id == id);
             if (person != null)
             {
@@ -60,6 +62,8 @@ namespace test_backend.Controllers
         [HttpPost]
         public ActionResult<Person> Post([FromBody] Person body)
         {
+            PersonsController.FailRandomly();
+
             if (!this.TryValidateModel(body))
             {
                 return this.BadRequest();
@@ -68,12 +72,14 @@ namespace test_backend.Controllers
             body.Id = PersonsController.TestData.Max(p => p.Id) + 1;
             PersonsController.TestData.Add(body);
 
-            return this.CreatedAtAction(nameof(Person), new { id = body.Id }, body);
+            return this.CreatedAtAction("Get", new { id = body.Id }, body);
         }
 
         [HttpPut("{id}")]
         public ActionResult<Person> Put(long id, [FromBody] Person body)
         {
+            PersonsController.FailRandomly();
+
             if (!this.TryValidateModel(body))
             {
                 return this.BadRequest();
@@ -94,6 +100,14 @@ namespace test_backend.Controllers
             person.LastName = body.LastName;
 
             return this.NoContent();
+        }
+
+        private static void FailRandomly()
+        {
+            if (DateTime.Now.Second % 2 == 0)
+            {
+                throw new ExpectedException();
+            }
         }
     }
 }

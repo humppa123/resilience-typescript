@@ -12,27 +12,100 @@ Run the following command:
 
 ## Quickstart
 
-TODO
+### Basic CRUD Operations
 
-## Builders
-
-### Resilient Pipeline Builder
-
-Allows you to create a customizable resilient pipeline, where you can chain e.g. a circuit breaker with a retry with a timeout. See the documentation for each component on how to set eachs parameters.
+You can create a resilient proxy that directly allows you to interact with a basic CRUD API server in a type save way with using e.g. a token cache, a circuit breaker, retry and timeout just like this:
 
 ```typescript
-const pipeline = ResilientPipelineBuilder
+// The model our API is using
+export class Person {
+    public firstName: string;
+    public lastName: string;
+    public id: number;
+}
+
+// Lets create a resilient proxy to interact with our pipeline
+const proxy = ResilientWebPipelineBuilder
     .New()
     .addLogger(new ConsoleLogger())
-    .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
-    .useRetry(3, 3)
-    .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
-    .build();
+    .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useRetry(2, 10) // All requests will do a retry before the circuit breaker
+    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .useBaseUrl("https://resilience-typescript.azurewebsites.net/api/persons") // The base URL for our web API
+    .buildToCrud<Person>(); // We build to a basic CRUD proxy, safely typed to our person class.
+
+// Now the proxy offers the following operations:
+const list = await proxy.list(); // Gets an Axios response with all data from the API
+const person: Person = { firstName: "Fabian", id: null, lastName: "Schwarz" }; // Our new model to add.
+const add = await proxy.add(person);
+const get = await proxy.get("1"); // Gets an item by its Id. All Ids are string, you maybe have to convert numbers or Guids to string.
+person.firstName += " Resilience"; // Lets update first name of our model
+person.lastName += " Typescript"; // And update last name too
+const update = await proxy.update("1", person); // Send update request to the API
+const delete = await proxy.delete("1"); // Send a delete request to the API
 ```
 
-### Resilient Web Pipeline Builder
+### Customizable Fluent Resilient Requests
 
+The previous builder allowed us to interact only with fixed endpoints of an API. To be more flexible and still have all the benefits of a resilient pipeline, all within a fluent, human readable language, you can build your pipeline to a request factory. This is the core purpose and heart of this library.
 
+```typescript
+// The model our API is using
+export class Person {
+    public firstName: string;
+    public lastName: string;
+    public id: number;
+}
+
+// Lets create a resilient proxy to interact with our pipeline
+const proxy = ResilientWebPipelineBuilder
+    .New()
+    .addLogger(new ConsoleLogger())
+    .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useRetry(2, 10) // All requests will do a retry before the circuit breaker
+    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .builtToRequestFactory(); // We build to a request factory.
+
+// Now the proxy offers a request factory where all requests will flow through the resilient pipeline like this:
+const list = await proxy
+    .request()
+    .get("https://my-api.com/api/persons")
+    .execute<Person[]>();
+const item = await proxy
+    .request()
+    .get("https://another-api-for-persons.com/api/persons/4")
+    .execute<Person>();
+const person: Person = { firstName: "Fabian", id: null, lastName: "Schwarz" }; // Our new model to add.
+const add = await proxy
+    .request()
+    .post("https://my-api.com/api/persons")
+    .withBody(person)
+    .execute<Person>();
+```
+
+### Custom Axios Request Config
+
+You can also create a pipeline where you can send custom Axios requets through using this example:
+
+```typescript
+// Lets create a resilient proxy to interact with our pipeline
+const proxy = ResilientWebPipelineBuilder
+    .New()
+    .addLogger(new ConsoleLogger())
+    .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useRetry(2, 10) // All requests will do a retry before the circuit breaker
+    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .build(); // We build our basic proxy.
+
+// Now we can send a custom Axios request through the pipeline:
+const request = { } as AxiosRequestConfig;
+request.method = "GET";
+request.url = "https://resilience-typescript.azurewebsites.net/api/persons";
+const list = await proxy.execute<Person[]>(request);
+```
 
 ## Components
 

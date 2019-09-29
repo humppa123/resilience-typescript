@@ -38,7 +38,7 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
         this.url = "";
         this.method = "GET";
         this.body = null;
-        this.maxContentLength = null;
+        this.maxContentLength = 10 * 1024 * 1024; // 10MB
         this.cancelToken = null;
     }
 
@@ -187,6 +187,7 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
             this.url = url;
         }
 
+        this.headers["Content-Type"] = "application/json";
         return this;
     }
 

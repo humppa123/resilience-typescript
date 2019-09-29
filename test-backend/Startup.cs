@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace test_backend
 {
@@ -38,7 +41,26 @@ namespace test_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = $"https://login.microsoftonline.com/{this.Configuration["AzureAd:Authority"]}";
+                    options.Audience = this.Configuration["AzureAd:Audience"];
+                    options.RequireHttpsMetadata = false;
+                    options.IncludeErrorDetails = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidIssuers = new List<string>
+                        {
+                            $"https://sts.windows.net/{this.Configuration["AzureAd:Authority"]}/",
+                            $"https://login.microsoftonline.com/{this.Configuration["AzureAd:Authority"]}"
+                        }
+                    };
+                });
+
             services.AddControllers();
+            services.AddApplicationInsightsTelemetry();
         }
     }
 }
