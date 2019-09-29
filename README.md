@@ -4,6 +4,12 @@
 
 ![icon](./.media/icon.png)
 
+## Installation
+
+Run the following command:
+
+`npm i resilience-typescript`
+
 ## Quickstart
 
 TODO
@@ -24,6 +30,10 @@ const pipeline = ResilientPipelineBuilder
     .build();
 ```
 
+### Resilient Web Pipeline Builder
+
+
+
 ## Components
 
 ### Pipeline
@@ -38,7 +48,6 @@ const proxies: IResilienceProxy[] = [];
 proxies.push(new CircuitBreakerProxy()); // Constructor is missing parameters for demonstration purpose!
 proxies.push(new RetryProxy()); // Constructor is missing parameters for demonstration purpose!
 proxies.push(new TimeoutProxy()); // Constructor is missing parameters for demonstration purpose!
-const successMessage = "This is a success!";
 const pipeline = new PipelineProxy(proxies);
 const func = async () => {...}; // An async function that does the real work and must be resolved within the pipeline
 
@@ -60,7 +69,7 @@ const func = async () => {...}; // An async function that does the real work and
 try {
     const result = await timeout.execute(func); // Executes the provided func if it does not resolve within the timespan, a TimeoutError will be thrown, else its result will be returned
 } catch (e) {
-    console.log(e.message); // A TimeoutError.
+    console.log(e.message); // A TimeoutError, its "innerError" contains the real error.
 }
 ```
 
@@ -78,7 +87,7 @@ const func = async () => {...}; // An async function that does the real work and
 try {
     const result = await retry.execute(func); // Executes the provided func at most three times if it fails.
 } catch (e) {
-    console.log(e.message); // A RetryError, its "innerException" contains the real error.
+    console.log(e.message); // A RetryError, its "innerError" contains the real error.
 }
 ```
 
@@ -98,7 +107,7 @@ const func = async () => {...}; // An async function that does the real work
 try {
     const result = await circuitBreaker.execute(func); // Executes the provided func at most three times if it fails.
 } catch (e) {
-    console.log(e.message); // A CircuitBreakerError, its "innerException" contains the real error.
+    console.log(e.message); // A CircuitBreakerError, its "innerError" contains the real error.
 }
 ```
 
@@ -173,7 +182,7 @@ A default implementation of a cache that stores all values in memory. To minimze
 ![memory](./.media/memorycache.png)
 
 ```typescript
-const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneHour; // Cache entries are expire after one hour
+const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneHour; // Cache entries expire after one hour
 const garbageCollectEveryXRequests = 100; // Removing of expired items will take place every 100 calls to the 'execute' function
 const maxEntryCount = 500; // Cache holds 500 entries maximum. If more are added, the oldest will be removed.
 const key = "KeyForFunc"; // The key for the result of the func. Must be provided.
@@ -182,7 +191,7 @@ const cache = new MemoryCache<string>(expirationTimeSpanMs, logger, garbageColle
 try {
     const result = await cache.execute(func, key); // Returns a value from the cache if present or executes the func to get the value and stores it in the cache under the given key.
 } catch (e) {
-    console.log(e.message); // A CacheError, its "innerException" contains the real error.
+    console.log(e.message); // A CacheError, its "innerError" contains the real error.
 }
 ```
 
