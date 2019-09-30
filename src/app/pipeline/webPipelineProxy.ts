@@ -8,6 +8,7 @@ import { IResilienceWebProxy } from "../contracts/resilienceWebProxy";
 import { ILogger } from "../contracts/logger";
 import { getUrlFromAxisRequest } from "../logging/utils";
 import { logFormatter } from "../resilience/utils";
+import { timer } from "../utils/timer";
 
 /**
  * A web pipeline proxy.
@@ -81,6 +82,7 @@ export class WebPipelineProxy implements IResilienceWebProxy {
             this.logger.debug(`Requesting '${getUrlFromAxisRequest(request)}'`, null, logFormatter);
         }
 
+        const durationTimer = timer();
         if ((this.itemCache && cacheKey) && this.pipeline) {
             result = await this.itemCache.execute(() => this.pipeline.execute(() => Axios(request)), cacheKey);
         } else {
@@ -93,6 +95,11 @@ export class WebPipelineProxy implements IResilienceWebProxy {
                     result = await Axios(request);
                 }
             }
+        }
+
+        const milliseconds = durationTimer.milliSeconds;
+        if (this.logger) {
+            this.logger.debug(`Request '${getUrlFromAxisRequest(request)}' finished within ${milliseconds}ms`, null, logFormatter);
         }
 
         return result;

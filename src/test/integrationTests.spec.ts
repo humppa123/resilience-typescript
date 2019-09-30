@@ -9,6 +9,7 @@ import { ConsoleLogger } from "../app/logging/consoleLogger";
 import { DefaultTokenCache } from "../app/tokenCache/defaultTokenCache";
 import { Person } from "./person";
 import { AxiosRequestConfig } from "axios";
+import { LogLevel } from "../app/logging/logLevel";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 

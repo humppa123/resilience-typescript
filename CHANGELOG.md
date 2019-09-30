@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 - 2019.09.30
+
+* Fixed request URL logging to always include base URL.
+* Added request duration log output to debug log level
+
 ## 1.2.1 - 2019.09.30
 
 * Console Logger output now writes log level before time stamp.

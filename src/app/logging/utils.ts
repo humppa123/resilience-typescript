@@ -27,14 +27,14 @@ export function getUrlFromAxisRequest(request: AxiosRequestConfig) {
     let url: string = "";
     if (request.baseURL && request.url) {
         url = `${request.baseURL}${request.url}`;
-    }
+    } else {
+        if (request.baseURL) {
+            url = request.baseURL;
+        }
 
-    if (request.baseURL) {
-        url = request.baseURL;
-    }
-
-    if (request.url) {
-        url = request.url;
+        if (request.url) {
+            url = request.url;
+        }
     }
 
     if (request.params && Object.keys(request.params).length > 0) {
