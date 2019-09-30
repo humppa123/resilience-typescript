@@ -1,5 +1,6 @@
-import { Method, CancelToken, AxiosRequestConfig } from "axios";
+import { Method, CancelToken, AxiosRequestConfig, ResponseType } from "axios";
 import { IAxiosRequestBuilder } from "./contracts/axiosRequestBuilder";
+import { Guard } from "./utils/guard";
 
 /**
  * An Axios request builder.
@@ -9,6 +10,10 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
      * Gets the headers dictionary.
      */
     private readonly headers: { [id: string]: string; };
+    /**
+     * Gets the params.
+     */
+    private readonly params: { [name: string]: string};
     /**
      * Gets or sets the URL.
      */
@@ -29,6 +34,10 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
      * Gets or sets the cancel token.
      */
     private cancelToken: CancelToken;
+    /**
+     * Gets or sets the response type.
+     */
+    private responseType?: ResponseType;
 
     /**
      * Initializes a new instance of the @see AxiosRequestBuilder class.
@@ -40,6 +49,8 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
         this.body = null;
         this.maxContentLength = 10 * 1024 * 1024; // 10MB
         this.cancelToken = null;
+        this.responseType = null;
+        this.params = {};
     }
 
     /**
@@ -206,6 +217,32 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
     }
 
     /**
+     * Sets a response type.
+     * @param value Value to set.
+     * @returns The builder.
+     */
+    public withResponseType(value: ResponseType): AxiosRequestBuilder {
+        this.responseType = value;
+
+        return this;
+    }
+
+    /**
+     * Adds a query parameter to the request.
+     * @param name Name of the query paramter.
+     * @param value Value of the query parameter.
+     * @returns The builder.
+     */
+    public addQueryParameter(name: string, value: string): AxiosRequestBuilder {
+        Guard.throwIfNullOrEmpty(name, "name");
+        Guard.throwIfNullOrEmpty(value, "value");
+
+        this.params[name] = value;
+
+        return this;
+    }
+
+    /**
      * Builds the request.
      * @returns Axios request configuration.
      */
@@ -218,6 +255,10 @@ export class AxiosRequestBuilder implements IAxiosRequestBuilder {
         result.maxContentLength = this.maxContentLength;
         result.method = this.method;
         result.url = this.url;
+        result.responseType = this.responseType;
+        if (Object.keys(this.params).length > 0) {
+            result.params = this.params;
+        }
 
         return result;
     }

@@ -15,6 +15,7 @@ export * from "./app/contracts/tokenProvider";
 export * from "./app/logging/abstractStringLogger";
 export * from "./app/logging/consoleLogger";
 export * from "./app/logging/logLevel";
+export * from "./app/logging/multiLogger";
 export * from "./app/logging/noLogger";
 export * from "./app/logging/testLogger";
 export * from "./app/logging/utils";

@@ -5,6 +5,9 @@ import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { Guard } from "../utils/guard";
 import Axios from "axios";
 import { IResilienceWebProxy } from "../contracts/resilienceWebProxy";
+import { ILogger } from "../contracts/logger";
+import { getUrlFromAxisRequest } from "../logging/utils";
+import { logFormatter } from "../resilience/utils";
 
 /**
  * A web pipeline proxy.
@@ -26,6 +29,10 @@ export class WebPipelineProxy implements IResilienceWebProxy {
      * Gets the optional base URL.
      */
     private readonly baseUrl: string;
+    /**
+     * Gets the logger.
+     */
+    private readonly logger: ILogger<string>;
 
     /**
      * Initializes a new instance of the @see WebPipelineProxy class.
@@ -33,12 +40,14 @@ export class WebPipelineProxy implements IResilienceWebProxy {
      * @param itemCache The item cache to use if any.
      * @param tokenCache The token cache to use if any.
      * @param baseUrl The base URL to use if any.
+     * @param logger Logger to use if any.
      */
-    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null) {
+    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null, logger: ILogger<string> = null) {
         this.pipeline = pipeline;
         this.tokenCache = tokenCache;
         this.itemCache = itemCache;
         this.baseUrl = baseUrl;
+        this.logger = logger;
     }
 
     /**
@@ -68,6 +77,10 @@ export class WebPipelineProxy implements IResilienceWebProxy {
         }
 
         let result: axios.AxiosResponse<TResult>;
+        if (this.logger) {
+            this.logger.debug(`Requesting '${getUrlFromAxisRequest(request)}'`, null, logFormatter);
+        }
+
         if ((this.itemCache && cacheKey) && this.pipeline) {
             result = await this.itemCache.execute(() => this.pipeline.execute(() => Axios(request)), cacheKey);
         } else {

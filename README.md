@@ -46,6 +46,14 @@ const update = await proxy.update("1", person); // Send update request to the AP
 const delete = await proxy.delete("1"); // Send a delete request to the API
 ```
 
+Given the example above, the operations will call the following endpoints:
+
+* **list()**: GET <https://resilience-typescript.azurewebsites.net/api/persons>
+* **get(id)**: GET <https://resilience-typescript.azurewebsites.net/api/persons/:id>
+* **add(item)**: POST <https://resilience-typescript.azurewebsites.net/api/persons>
+* **update(id, item)**: PUT <https://resilience-typescript.azurewebsites.net/api/persons/:id>
+* **delete(id)**: DELETE <https://resilience-typescript.azurewebsites.net/api/persons/:id>
+
 ### Customizable Fluent Resilient Requests
 
 The previous builder allowed us to interact only with fixed endpoints of an API. To be more flexible and still have all the benefits of a resilient pipeline, all within a fluent, human readable language, you can build your pipeline to a request factory. This is the core purpose and heart of this library.

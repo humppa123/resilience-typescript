@@ -3,7 +3,7 @@ import { IResilienceWebProxy } from "../contracts/resilienceWebProxy";
 import { Guard } from "../utils/guard";
 import axios = require("axios");
 import { IResilienceFactoryProxy } from "../contracts/resilienceFactoryProxy";
-import { CancelToken, Method, AxiosRequestConfig } from "axios";
+import { CancelToken, Method, AxiosRequestConfig, ResponseType } from "axios";
 
 /**
  * An Axios request builder with a pipeline.
@@ -13,6 +13,10 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
      * Gets the headers dictionary.
      */
     private readonly headers: { [id: string]: string; };
+    /**
+     * Gets the params.
+     */
+    private readonly params: { [name: string]: string};
     /**
      * Gets or sets the pipeline.
      */
@@ -37,6 +41,10 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
      * Gets or sets the cancel token.
      */
     private cancelToken: CancelToken;
+    /**
+     * Gets or sets the response type.
+     */
+    private responseType?: ResponseType;
 
     /**
      * Initializes a new instance of the @see AxiosRequestBuilder class.
@@ -48,6 +56,8 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
         this.body = null;
         this.maxContentLength = 10 * 1024 * 1024; // 10MB
         this.cancelToken = null;
+        this.responseType = null;
+        this.params = {};
     }
 
     /**
@@ -238,6 +248,32 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
     }
 
     /**
+     * Sets a response type.
+     * @param value Value to set.
+     * @returns The builder.
+     */
+    public withResponseType(value: ResponseType): IResilienceFactoryProxy {
+        this.responseType = value;
+
+        return this;
+    }
+
+    /**
+     * Adds a query parameter to the request.
+     * @param name Name of the query paramter.
+     * @param value Value of the query parameter.
+     * @returns The builder.
+     */
+    public addQueryParameter(name: string, value: string): IResilienceFactoryProxy {
+        Guard.throwIfNullOrEmpty(name, "name");
+        Guard.throwIfNullOrEmpty(value, "value");
+
+        this.params[name] = value;
+
+        return this;
+    }
+
+    /**
      * Builds the request.
      * @returns Axios request configuration.
      */
@@ -250,6 +286,10 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
         result.maxContentLength = this.maxContentLength;
         result.method = this.method;
         result.url = this.url;
+        result.responseType = this.responseType;
+        if (Object.keys(this.params).length > 0) {
+            result.params = this.params;
+        }
 
         return result;
     }

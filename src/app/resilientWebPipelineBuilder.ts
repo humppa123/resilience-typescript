@@ -109,7 +109,7 @@ export class ResilientWebPipelineBuilder {
      */
     public build(): IResilienceWebProxy {
         const build = this.prepareBuild();
-        return new WebPipelineProxy(build[0], build[1], build[2], build[3]);
+        return new WebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
     }
 
     /**
@@ -118,7 +118,7 @@ export class ResilientWebPipelineBuilder {
      */
     public buildToCrud<TItem>(): IResilienceCrudWebProxy<TItem> {
         const build = this.prepareBuild();
-        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3]);
+        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
     }
 
     /**
@@ -127,7 +127,7 @@ export class ResilientWebPipelineBuilder {
      */
     public builtToRequestFactory(): FactoryWebPipelineProxy {
         const build = this.prepareBuild();
-        const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3]);
+        const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
         return new FactoryWebPipelineProxy(proxy);
     }
 

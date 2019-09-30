@@ -1,6 +1,6 @@
 import axios = require("axios");
 import { IAxiosRequestBuilder } from "./axiosRequestBuilder";
-import { CancelToken } from "axios";
+import { CancelToken, ResponseType } from "axios";
 
 /**
  * Builder and executor for web requests with a resilient pipeline.
@@ -97,4 +97,19 @@ export interface IResilienceFactoryProxy {
      * @returns The builder.
      */
     put(url?): IResilienceFactoryProxy;
+
+    /**
+     * Sets a response type.
+     * @param value Value to set.
+     * @returns The builder.
+     */
+    withResponseType(value: ResponseType): IResilienceFactoryProxy;
+
+    /**
+     * Adds a query parameter to the request.
+     * @param name Name of the query paramter.
+     * @param value Value of the query parameter.
+     * @returns The builder.
+     */
+    addQueryParameter(name: string, value: string): IResilienceFactoryProxy;
 }

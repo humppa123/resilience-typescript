@@ -1,17 +1,28 @@
 import { LogLevel } from "./logLevel";
-import { getUtcDateTimeString } from "./utils";
 import { AbstractStringLogger } from "./abstractStringLogger";
+import { ILogger } from "../..";
+import { Guard } from "../utils/guard";
 
 /**
- * A logger that logs to the default console.
+ * A logger that is a container for other loggers.
  */
-export class ConsoleLogger extends AbstractStringLogger {
+export class MultiLogger extends AbstractStringLogger {
+    /**
+     * Gets the internal loggers.
+     */
+    private readonly loggers: Array<ILogger<string>>;
+
     /**
      * Initializes a new instance of the @see ConsoleLogger class.
+     * @param loggers Loggers this multi logger will contain.
      * @param minimumLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
      */
-    constructor(minimumLevel?: LogLevel) {
+    constructor(loggers: Array<ILogger<string>>, minimumLevel?: LogLevel) {
+        Guard.throwIfNullOrEmpty(loggers, "loggers");
+
         super(minimumLevel || LogLevel.Trace);
+
+        this.loggers = loggers;
     }
 
     /**
@@ -22,6 +33,8 @@ export class ConsoleLogger extends AbstractStringLogger {
      * @param formatter Function to create a string message of the state and error.
      */
     protected logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        console.log(`${logLevel.toLocaleUpperCase()}: ${getUtcDateTimeString()} ${formatter(state, error)}`);
+        for (const logger of this.loggers) {
+            logger.log(logLevel, state, error, formatter);
+        }
     }
 }

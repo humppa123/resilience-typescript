@@ -1,4 +1,4 @@
-import { CancelToken } from "axios";
+import { CancelToken, ResponseType } from "axios";
 
 /**
  * An Axios request builder.
@@ -88,4 +88,19 @@ export interface IAxiosRequestBuilder {
      * @returns The builder.
      */
     put(url?): IAxiosRequestBuilder;
+
+    /**
+     * Sets a response type.
+     * @param value Value to set.
+     * @returns The builder.
+     */
+    withResponseType(value: ResponseType): IAxiosRequestBuilder;
+
+    /**
+     * Adds a query parameter to the request.
+     * @param name Name of the query paramter.
+     * @param value Value of the query parameter.
+     * @returns The builder.
+     */
+    addQueryParameter(name: string, value: string): IAxiosRequestBuilder;
 }

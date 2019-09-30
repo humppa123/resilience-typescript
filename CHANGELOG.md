@@ -1,7 +1,12 @@
 # Changelog
 
-## 0.1.0 - 2019.09.10
+## 1.2.1 - 2019.09.30
 
-* Added retry and timeout components
-* Added logging
-* Added token cache
+* Console Logger output now writes log level before time stamp.
+* Added response type and query params to Axios request builders.
+* Added a multi logger that is a container for several other loggers.
+* Added logging of request URL.
+
+## 1.1.1 - 2019.09.29
+
+* Initial public release
