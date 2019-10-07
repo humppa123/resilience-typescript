@@ -40,7 +40,7 @@ export class DefaultTokenCache implements ITokenCache {
     public async getToken(): Promise<Token> {
         this.logger.trace(`Requesting token from cache`, null, logFormatter);
         if (!this.token || this.hasExpired(this.token)) {
-            this.logger.debug(`Token in cache empty or expired, requesting new from provider`, null, logFormatter);
+            this.logger.warning(`Token in cache empty or expired, requesting new from provider`, null, logFormatter);
             this.token = await this.provider.getToken();
         } else {
             this.logger.trace(`Using token from cache`, null, logFormatter);

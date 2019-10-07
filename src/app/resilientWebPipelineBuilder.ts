@@ -16,6 +16,10 @@ import { DefaultTokenCache } from "./tokenCache/defaultTokenCache";
 import { IResilienceCrudWebProxy } from "./contracts/resilienceCrudWebProxy";
 import { CrudWebPipelineProxy } from "./pipeline/crudWebPipelineProxy";
 import { FactoryWebPipelineProxy } from "./pipeline/factoryWebPipelineProxy";
+import { MultiLogger } from "./logging/multiLogger";
+import { LogLevel } from "./logging/logLevel";
+import { ConsoleLogger } from "./logging/consoleLogger";
+import { AppInsightsLogger } from "./logging/appInsightsLogger";
 
 /**
  * A builder to create a resilient web pipeline.
@@ -54,9 +58,9 @@ export class ResilientWebPipelineBuilder {
      */
     private memoryCacheMaxEntryCount: number;
     /**
-     * Gets or sets the logger to use.
+     * Gets or sets the loggers to use.
      */
-    private logger: ILogger<string>;
+    private loggers: Array<ILogger<string>>;
     /**
      * Gets or sets a value indicating whether Azure AD token provider should be built.
      */
@@ -91,7 +95,7 @@ export class ResilientWebPipelineBuilder {
         this.baseUrl = null;
         this.buildMemoryCache = false;
         this.customCache = null;
-        this.logger = new NoLogger();
+        this.loggers = [];
         this.buildAzureTokenProvider = false;
     }
 
@@ -108,8 +112,9 @@ export class ResilientWebPipelineBuilder {
      * @returns The web pipeline.
      */
     public build(): IResilienceWebProxy {
-        const build = this.prepareBuild();
-        return new WebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
+        const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
+        const build = this.prepareBuild(logger);
+        return new WebPipelineProxy(build[0], build[1], build[2], build[3], logger);
     }
 
     /**
@@ -117,8 +122,9 @@ export class ResilientWebPipelineBuilder {
      * @returns A CRUD web pipeline.
      */
     public buildToCrud<TItem>(): IResilienceCrudWebProxy<TItem> {
-        const build = this.prepareBuild();
-        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
+        const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
+        const build = this.prepareBuild(logger);
+        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3], logger);
     }
 
     /**
@@ -126,8 +132,9 @@ export class ResilientWebPipelineBuilder {
      * @returns A web request factory.
      */
     public builtToRequestFactory(): FactoryWebPipelineProxy {
-        const build = this.prepareBuild();
-        const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3], this.logger);
+        const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
+        const build = this.prepareBuild(logger);
+        const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3], logger);
         return new FactoryWebPipelineProxy(proxy);
     }
 
@@ -226,14 +233,34 @@ export class ResilientWebPipelineBuilder {
     }
 
     /**
-     * Adds a logger.
+     * Adds a custom logger.
      * @param logger Logger to include.
      * @returns The builder.
      */
-    public addLogger(logger: ILogger<string>): ResilientWebPipelineBuilder {
+    public useCustomLogger(logger: ILogger<string>): ResilientWebPipelineBuilder {
         Guard.throwIfNullOrEmpty(logger, "logger");
 
-        this.logger = logger;
+        this.loggers.push(logger);
+        return this;
+    }
+
+    /**
+     * Adds a console logger.
+     * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
+     */
+    public useConsoleLogger(logLevel?: LogLevel): ResilientWebPipelineBuilder {
+        this.loggers.push(new ConsoleLogger(logLevel));
+
+        return this;
+    }
+
+    /**
+     * Adds an Azure Application Insights logger.
+     * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
+     */
+    public useAppInsightsLogger(logLevel?: LogLevel): ResilientWebPipelineBuilder {
+        this.loggers.push(new AppInsightsLogger(logLevel));
+
         return this;
     }
 
@@ -287,26 +314,27 @@ export class ResilientWebPipelineBuilder {
 
     /**
      * Builds the web pipeline.
+     * @param logger Logger to use.
      * @returns The web pipeline.
      */
-    private prepareBuild(): [IResilienceProxy, ICache<string, axios.AxiosResponse>, ITokenCache, string] {
+    private prepareBuild(logger: ILogger<string>): [IResilienceProxy, ICache<string, axios.AxiosResponse>, ITokenCache, string] {
         let pipeline: IResilienceProxy;
         if (this.buildPipeline) {
-            this.pipelineBuilder.addLogger(this.logger);
+            this.pipelineBuilder.useCustomLogger(logger);
             pipeline = this.pipelineBuilder.build();
         }
 
         let cache: ICache<string, axios.AxiosResponse>;
         if (this.buildMemoryCache) {
-            cache = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, this.logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
+            cache = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
         } else {
             cache = this.customCache;
         }
 
         let tokenCache: ITokenCache;
         if (this.buildAzureTokenProvider) {
-            const provider = new AzureActiveDirectoryAppRegistrationTokenProvider(this.aadBaseUrl, this.aadClientId, this.aadClientSecret, this.aadTenantId, this.logger);
-            tokenCache = new DefaultTokenCache(provider, this.logger);
+            const provider = new AzureActiveDirectoryAppRegistrationTokenProvider(this.aadBaseUrl, this.aadClientId, this.aadClientSecret, this.aadTenantId, logger);
+            tokenCache = new DefaultTokenCache(provider, logger);
         } else {
             tokenCache = this.customTokenCache;
         }

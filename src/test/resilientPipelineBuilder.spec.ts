@@ -13,7 +13,6 @@ describe("Resilence", () => {
             // Arrange
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
                 .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
@@ -34,7 +33,7 @@ describe("Resilence", () => {
             // Arrange
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
+                .useCustomLogger(new NoLogger())
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
                 .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
@@ -54,7 +53,7 @@ describe("Resilence", () => {
             const doubledPosition = 13;
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
+                .useCustomLogger(new NoLogger())
                 .addProxy(doubledPosition, new RetryProxy(2, new NoLogger()));
 
             // Act
@@ -69,7 +68,7 @@ describe("Resilence", () => {
             const doubledPosition = 13;
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
+                .useCustomLogger(new NoLogger())
                 .addProxy(doubledPosition, new RetryProxy(2, new NoLogger()));
 
             // Act
@@ -84,7 +83,7 @@ describe("Resilence", () => {
             const doubledPosition = 13;
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
+                .useCustomLogger(new NoLogger())
                 .addProxy(doubledPosition, new RetryProxy(2, new NoLogger()));
 
             // Act
@@ -99,7 +98,7 @@ describe("Resilence", () => {
             const doubledPosition = 13;
             const pipeline = ResilientPipelineBuilder
                 .New()
-                .addLogger(new NoLogger())
+                .useCustomLogger(new NoLogger())
                 .useTimeout(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds);
 
             // Act
