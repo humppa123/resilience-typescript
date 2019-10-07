@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1 - 2019.10.07
+
+* Simplified memory cache by using a new cache entry model.
+
 ## 1.2.2 - 2019.09.30
 
 * Fixed request URL logging to always include base URL.
