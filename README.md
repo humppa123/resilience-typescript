@@ -27,7 +27,7 @@ export class Person {
 // Lets create a resilient proxy to interact with our pipeline
 const proxy = ResilientWebPipelineBuilder
     .New()
-    .addLogger(new ConsoleLogger())
+    .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
     .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
@@ -69,7 +69,7 @@ export class Person {
 // Lets create a resilient proxy to interact with our pipeline
 const proxy = ResilientWebPipelineBuilder
     .New()
-    .addLogger(new ConsoleLogger())
+    .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
     .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
@@ -101,7 +101,7 @@ You can also create a pipeline where you can send custom Axios requets through u
 // Lets create a resilient proxy to interact with our pipeline
 const proxy = ResilientWebPipelineBuilder
     .New()
-    .addLogger(new ConsoleLogger())
+    .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
     .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
@@ -237,7 +237,9 @@ This package contains its own logging mechanism but you can easily include your 
 
 There are also three predefined logger already included:
 
-* `ConsoleLogger`: A logger that writes every log message independent of its log level to the console.
+* `ConsoleLogger`: A logger that writes every log message to the console.
+* `AppInsightsLogger`: A logger that writes every log messages to Azure Application Insights. Please ensure you have correctly setup Application Insights using [this manual here](https://github.com/Microsoft/ApplicationInsights-node.js/) before using this logger, otherwise you application will crash. All logs will be added as _traces_ into Application Insights.
+* `MultiLogger`: A logger that is a container for other loggers. It will be used if you specify more than one logger in the builders, e.g. a _ConsoleLogger_ and an _AppInsightsLogger_. The multi logger will then forward all messages to its two internal loggers.
 * `NoLogger`: A logger that does nothing, it basically disables all logging.
 * `TestLogger`: A logger that's primary designed for unit tests where you can provide a callback that will be called for each log message, to test if and what log messages are generated.
 
