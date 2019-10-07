@@ -1,7 +1,11 @@
 # Changelog
 
-## 1.3.1 - 2019.10.07
+## 2.1.1 - 2019.10.08
 
+This version includes **breaking API changes**
+
+* New logging builder API
+* Added Azure Application Insights Logger
 * Simplified memory cache by using a new cache entry model.
 
 ## 1.2.2 - 2019.09.30
