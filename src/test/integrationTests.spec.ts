@@ -9,7 +9,6 @@ import { ConsoleLogger } from "../app/logging/consoleLogger";
 import { DefaultTokenCache } from "../app/tokenCache/defaultTokenCache";
 import { Person } from "./person";
 import { AxiosRequestConfig } from "axios";
-import { LogLevel } from "../app/logging/logLevel";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -39,7 +38,7 @@ describe("Resilence", () => {
             // Arrange
             const proxy = ResilientWebPipelineBuilder
                 .New()
-                .addLogger(logger)
+                .useCustomLogger(logger)
                 .useTokenCache(tokenCache)
                 .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(2, 30)
@@ -61,7 +60,7 @@ describe("Resilence", () => {
             // Arrange
             const proxy = ResilientWebPipelineBuilder
                 .New()
-                .addLogger(logger)
+                .useCustomLogger(logger)
                 .useTokenCache(tokenCache)
                 .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(2, 30)
@@ -101,7 +100,7 @@ describe("Resilence", () => {
             // Arrange
             const proxy = ResilientWebPipelineBuilder
                 .New()
-                .addLogger(logger)
+                .useCustomLogger(logger)
                 .useTokenCache(tokenCache)
                 .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(2, 30)
@@ -170,7 +169,7 @@ describe("Resilence", () => {
             // Arrange
             const proxy = ResilientWebPipelineBuilder
                 .New()
-                .addLogger(logger)
+                .useCustomLogger(logger)
                 .useTokenCache(tokenCache)
                 .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(2, 30)

@@ -7,6 +7,10 @@ import { CircuitBreakerState } from "./resilience/circuitBreakerState";
 import { CircuitBreakerProxy } from "./resilience/circuitBreakerProxy";
 import { RetryProxy } from "./resilience/retryProxy";
 import { TimeoutProxy } from "./resilience/timeoutProxy";
+import { MultiLogger } from "./logging/multiLogger";
+import { LogLevel } from "./logging/logLevel";
+import { ConsoleLogger } from "./logging/consoleLogger";
+import { AppInsightsLogger } from "./logging/appInsightsLogger";
 
 /**
  * Builder for a resilient pipeline.
@@ -65,9 +69,9 @@ export class ResilientPipelineBuilder {
      */
     private timeoutPosition: number;
     /**
-     * Gets or sets the logger to use.
+     * Gets or sets the loggers to use.
      */
-    private logger: ILogger<string>;
+    private loggers: Array<ILogger<string>>;
 
     /**
      * Initializes a new instance of the @see ResiliencePipelineBuilder class.
@@ -77,7 +81,7 @@ export class ResilientPipelineBuilder {
         this.circuitBreakerIncluded = false;
         this.retryIncluded = false;
         this.timeoutIncluded = false;
-        this.logger = new NoLogger();
+        this.loggers = [];
     }
 
     /**
@@ -89,14 +93,55 @@ export class ResilientPipelineBuilder {
     }
 
     /**
+     * Prepares the loggers.
+     * @returns The loggers.
+     */
+    public static prepareLoggers(loggers: Array<ILogger<string>>): ILogger<string> {
+        let logger: ILogger<string> = null;
+        switch (loggers.length) {
+            case 0:
+                logger = new NoLogger();
+                break;
+            case 1:
+                logger = loggers[0];
+                break;
+            default:
+                logger = new MultiLogger(loggers);
+                break;
+        }
+
+        return logger;
+    }
+
+    /**
      * Adds a logger.
      * @param logger Logger to include.
      * @returns The builder.
      */
-    public addLogger(logger: ILogger<string>): ResilientPipelineBuilder {
+    public useCustomLogger(logger: ILogger<string>): ResilientPipelineBuilder {
         Guard.throwIfNullOrEmpty(logger, "logger");
 
-        this.logger = logger;
+        this.loggers.push(logger);
+        return this;
+    }
+
+    /**
+     * Adds a console logger.
+     * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
+     */
+    public useConsoleLogger(logLevel?: LogLevel): ResilientPipelineBuilder {
+        this.loggers.push(new ConsoleLogger(logLevel));
+
+        return this;
+    }
+
+    /**
+     * Adds an Azure Application Insights logger.
+     * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
+     */
+    public useAppInsightsLogger(logLevel?: LogLevel): ResilientPipelineBuilder {
+        this.loggers.push(new AppInsightsLogger(logLevel));
+
         return this;
     }
 
@@ -188,16 +233,17 @@ export class ResilientPipelineBuilder {
      * @returns The resilience pipeline.
      */
     public build(): IResilienceProxy {
+        const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         if (this.circuitBreakerIncluded) {
-            this.proxies[this.circuitBreakerPosition] = new CircuitBreakerProxy(this.circuitBreakerBreakDurationMs, this.circuitBreakerMaxFailedCalls, this.logger, this.circuitBreakerStateChangedCallback, this.circuitBreakerInitialState);
+            this.proxies[this.circuitBreakerPosition] = new CircuitBreakerProxy(this.circuitBreakerBreakDurationMs, this.circuitBreakerMaxFailedCalls, logger, this.circuitBreakerStateChangedCallback, this.circuitBreakerInitialState);
         }
 
         if (this.retryIncluded) {
-            this.proxies[this.retryPosition] = new RetryProxy(this.retryRetries, this.logger);
+            this.proxies[this.retryPosition] = new RetryProxy(this.retryRetries, logger);
         }
 
         if (this.timeoutIncluded) {
-            this.proxies[this.timeoutPosition] = new TimeoutProxy(this.timeoutTimeoutMs, this.logger);
+            this.proxies[this.timeoutPosition] = new TimeoutProxy(this.timeoutTimeoutMs, logger);
         }
 
         const keys: number[] = [];

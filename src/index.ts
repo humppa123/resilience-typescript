@@ -1,3 +1,4 @@
+export * from "./app/caching/cacheEntry";
 export * from "./app/caching/cacheError";
 export * from "./app/caching/memoryCache";
 export * from "./app/caching/memoryQueue";
@@ -13,6 +14,7 @@ export * from "./app/contracts/resilienceWebProxy";
 export * from "./app/contracts/tokenCache";
 export * from "./app/contracts/tokenProvider";
 export * from "./app/logging/abstractStringLogger";
+export * from "./app/logging/appInsightsLogger";
 export * from "./app/logging/consoleLogger";
 export * from "./app/logging/logLevel";
 export * from "./app/logging/multiLogger";

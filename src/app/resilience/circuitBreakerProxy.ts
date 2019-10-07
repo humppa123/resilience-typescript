@@ -170,7 +170,7 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      * @param newState The new state.
      */
     private updateState(newState: CircuitBreakerState): void {
-        this.logger.information(`Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
+        this.logger.warning(`Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
         this.state = newState;
         if (this.stateChangedCallback) {
             this.stateChangedCallback(newState);
