@@ -269,16 +269,17 @@ export class ResilientWebPipelineBuilder {
      * @param position Position of the circuit breaker in the pipeline.
      * @param breakDurationMs Minimum time in milli seconds circuit breaker will stay in open state.
      * @param maxFailedCalls Maximum failed calls before opening the circuit breaker.
+     * @param leakTimeSpanInMilliSeconds Timespan in milliseconds in within errors are counted against max failed calls.
      * @param stateChangedCallback Callback to invoke if internal state has changed.
      * @param initialState The initial state of the circuit breaker.
      * @returns The builder.
      */
-    public useCircuitBreaker(position: number, breakDurationMs: number, maxFailedCalls: number, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close): ResilientWebPipelineBuilder {
+    public useCircuitBreaker(position: number, breakDurationMs: number, maxFailedCalls: number, leakTimeSpanInMilliSeconds: number, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close): ResilientWebPipelineBuilder {
         Guard.throwIfNullOrEmpty(breakDurationMs, "breakDurationMs");
         Guard.throwIfNullOrEmpty(maxFailedCalls, "maxFailedCalls");
 
         this.buildPipeline = true;
-        this.pipelineBuilder.useCircuitBreaker(position, breakDurationMs, maxFailedCalls, stateChangedCallback, initialState);
+        this.pipelineBuilder.useCircuitBreaker(position, breakDurationMs, maxFailedCalls, leakTimeSpanInMilliSeconds, stateChangedCallback, initialState);
 
         return this;
     }

@@ -13,6 +13,16 @@ export async function sleepAndReject<TResult>(timeSpan: number): Promise<TResult
 }
 
 /**
+ * Sleeps for a give time in milli seconds.
+ * @param ms Milli seconds to sleep.
+ */
+export async function sleep(ms: number): Promise<unknown> {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
+
+/**
  * Default log string formatter for resiliency proxies.
  * @param state Log state message if any.
  * @param error Error of log entry if any.

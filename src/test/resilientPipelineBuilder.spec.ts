@@ -14,7 +14,7 @@ describe("Resilence", () => {
             const pipeline = ResilientPipelineBuilder
                 .New()
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
-                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
+                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
                 .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
                 .build();
@@ -35,7 +35,7 @@ describe("Resilence", () => {
                 .New()
                 .useCustomLogger(new NoLogger())
                 .addProxy(1, new RetryProxy(2, new NoLogger()))
-                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, 10)
+                .useCircuitBreaker(2, TimeSpansInMilliSeconds.TenMinutes, TimeSpansInMilliSeconds.TenMinutes, 10)
                 .useRetry(3, 3)
                 .useTimeout(4, TimeSpansInMilliSeconds.OneHundredMilliSeconds)
                 .build();
@@ -58,7 +58,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            expect(() => pipeline.useCircuitBreaker(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds, 5)).to.throw();
+            expect(() => pipeline.useCircuitBreaker(doubledPosition, TimeSpansInMilliSeconds.OneHundredMilliSeconds, TimeSpansInMilliSeconds.TenMinutes, 5)).to.throw();
 
             // Cleanup
             done();

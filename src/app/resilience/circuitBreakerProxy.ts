@@ -4,6 +4,7 @@ import { CircuitBreakerError } from "./circuitBreakerError";
 import { ILogger } from "../contracts/logger";
 import { Guard } from "../utils/guard";
 import { logFormatter } from "./utils";
+import { LeakingBucket } from "./leakingBucket";
 
 /**
  * A circuit breaker to protect a caller from failing resources.
@@ -22,17 +23,13 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      */
     private readonly breakDurationMs: number;
     /**
-     * Gets maximum failed calls before opening the circuit breaker.
+     * Gets the leaking bucket.
      */
-    private readonly maxFailedCalls: number;
+    private readonly bucket: LeakingBucket;
     /**
      * Gets or sets the current internal state.
      */
     private state: CircuitBreakerState;
-    /**
-     * Gets or sets the count of current failed calls.
-     */
-    private currentFailedCalls: number;
     /**
      * Gets or sets date when open state has expired.
      */
@@ -46,22 +43,23 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      * Initializes a new instance of the @see CircuitBreaker class.
      * @param breakDurationMs Minimum time in milli seconds circuit breaker will stay in open state.
      * @param maxFailedCalls Maximum failed calls before opening the circuit breaker.
+     * @param leakTimeSpanInMilliSeconds Timespan in milliseconds in within errors are counted against max failed calls.
      * @param logger Logger to use.
      * @param stateChangedCallback Callback to invoke if internal state has changed.
      * @param initialState The initial state of the circuit breaker.
      */
-    constructor(breakDurationMs: number, maxFailedCalls: number, logger: ILogger<string>, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close) {
+    constructor(breakDurationMs: number, maxFailedCalls: number, leakTimeSpanInMilliSeconds: number, logger: ILogger<string>, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close) {
         Guard.throwIfNullOrEmpty(breakDurationMs, "breakDurationMs");
         Guard.throwIfNullOrEmpty(maxFailedCalls, "maxFailedCalls");
+        Guard.throwIfNullOrEmpty(leakTimeSpanInMilliSeconds, "leakTimeSpanInMilliSeconds");
         Guard.throwIfNullOrEmpty(logger, "logger");
 
         this.breakDurationMs = breakDurationMs;
         this.stateChangedCallback = stateChangedCallback;
-        this.maxFailedCalls = maxFailedCalls;
+        this.bucket = new LeakingBucket(leakTimeSpanInMilliSeconds, maxFailedCalls);
         this.logger = logger;
 
         this.state = initialState;
-        this.currentFailedCalls = 0;
         this.openExpiration = new Date();
         // Set to past to have a valid initial state.
         this.openExpiration.setSeconds(this.openExpiration.getSeconds() - 5);
@@ -131,9 +129,9 @@ export class CircuitBreakerProxy implements IResilienceProxy {
         try {
             result = await func();
             success = true;
-            this.currentFailedCalls = 0;
             this.logger.debug(`Func in Circuit Breaker called succesfully.`, null, logFormatter);
             if (wasHalfOpen) {
+                this.bucket.clear();
                 this.updateState(CircuitBreakerState.Close);
             }
         } catch (e) {
@@ -153,8 +151,8 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      * @returns The error to return to the caller.
      */
     private handleError(error: Error, wasHalfOpen: boolean): Error {
-        this.currentFailedCalls++;
-        if (this.currentFailedCalls === this.maxFailedCalls || wasHalfOpen) {
+        this.bucket.insert(new Date());
+        if (this.bucket.isFull() || wasHalfOpen) {
             const expiration = new Date();
             expiration.setMilliseconds(expiration.getMilliseconds() + this.breakDurationMs);
             this.openExpiration = expiration;
