@@ -29,7 +29,7 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
     .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
     .useBaseUrl("https://resilience-typescript.azurewebsites.net/api/persons") // The base URL for our web API
@@ -71,7 +71,7 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
     .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
     .builtToRequestFactory(); // We build to a request factory.
@@ -103,7 +103,7 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
     .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
     .build(); // We build our basic proxy.
@@ -174,7 +174,7 @@ try {
 
 ### Circuit Breaker
 
-Allows a func to fail a configurable times before failing fast on a subsequent func call. On failure a `CircuitBreakerError` will be thrown with the `innerError` property containing the real error.
+Allows a func to fail whithin a configurable timespan configurable times before failing fast on a subsequent func call. On failure a `CircuitBreakerError` will be thrown with the `innerError` property containing the real error.
 
 ![circuitbreaker](./.media/circuitbreaker.png)
 
@@ -183,7 +183,8 @@ Allows a func to fail a configurable times before failing fast on a subsequent f
 const breakDuration = TimeSpansInMilliSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
 const maxFailedCalls = 5; // Circuit breaker will go into open state after five failed calls.
 const logger = new NoLogger(); // Empty logger, see Logging chapter.
-const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null);
+const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes; // Timespan within errors are counted
+const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null);
 const func = async () => {...}; // An async function that does the real work
 try {
     const result = await circuitBreaker.execute(func); // Executes the provided func at most three times if it fails.

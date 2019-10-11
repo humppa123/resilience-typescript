@@ -1,0 +1,184 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Retry",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\resilience\\retry.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Timeout",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\resilience\\timeout.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Circuit Breaker",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\resilience\\circuitBreaker.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Leaking Bucket",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\resilience\\leakingBucket.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Logger",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\logging\\logger.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Token Cache",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\tokenCache\\tokenCache.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Memory Cache",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\caching\\memoryCache.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Memory Queue",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\caching\\memoryQueue.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Pipeline",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\pipeline\\pipeline.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG ResilierntPipelineBuilder",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\resilientPipelineBuilder.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "DEBUG Integration Tests",
+            "program": "${workspaceFolder}\\src\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+              "--timeout",
+              "999999",
+              "--colors",
+              "${workspaceFolder}\\src\\dist\\test\\integrationTests.spec.js",
+              "--reporter=mocha-multi-reporters"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}\\src"
+          }
+    ]
+}

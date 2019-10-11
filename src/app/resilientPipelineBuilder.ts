@@ -45,6 +45,10 @@ export class ResilientPipelineBuilder {
      */
     private circuitBreakerPosition: number;
     /**
+     * Gets or sets timespan in milliseconds in within errors are counted against max failed calls.
+     */
+    private circuitBreakerLeakTimeSpanInMilliSeconds: number;
+    /**
      * Gets or sets a value indicating whether a retry proxy shall be included.
      */
     private retryIncluded: boolean;
@@ -167,13 +171,15 @@ export class ResilientPipelineBuilder {
      * @param position Position of the circuit breaker in the pipeline.
      * @param breakDurationMs Minimum time in milli seconds circuit breaker will stay in open state.
      * @param maxFailedCalls Maximum failed calls before opening the circuit breaker.
+     * @param leakTimeSpanInMilliSeconds Timespan in milliseconds in within errors are counted against max failed calls.
      * @param stateChangedCallback Callback to invoke if internal state has changed.
      * @param initialState The initial state of the circuit breaker.
      * @returns The builder.
      */
-    public useCircuitBreaker(position: number, breakDurationMs: number, maxFailedCalls: number, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close): ResilientPipelineBuilder {
+    public useCircuitBreaker(position: number, breakDurationMs: number, maxFailedCalls: number, leakTimeSpanInMilliSeconds: number, stateChangedCallback?: (state: CircuitBreakerState) => void, initialState: CircuitBreakerState = CircuitBreakerState.Close): ResilientPipelineBuilder {
         Guard.throwIfNullOrEmpty(breakDurationMs, "breakDurationMs");
         Guard.throwIfNullOrEmpty(maxFailedCalls, "maxFailedCalls");
+        Guard.throwIfNullOrEmpty(leakTimeSpanInMilliSeconds, "leakTimeSpanInMilliSeconds");
 
         if (!this.isPositionFree(position)) {
             throw new Error(`Position '${position}' is already in use in the pipeline!`);
@@ -185,6 +191,7 @@ export class ResilientPipelineBuilder {
         this.circuitBreakerMaxFailedCalls = maxFailedCalls;
         this.circuitBreakerStateChangedCallback = stateChangedCallback;
         this.circuitBreakerInitialState = initialState;
+        this.circuitBreakerLeakTimeSpanInMilliSeconds = leakTimeSpanInMilliSeconds;
 
         return this;
     }
@@ -235,7 +242,7 @@ export class ResilientPipelineBuilder {
     public build(): IResilienceProxy {
         const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         if (this.circuitBreakerIncluded) {
-            this.proxies[this.circuitBreakerPosition] = new CircuitBreakerProxy(this.circuitBreakerBreakDurationMs, this.circuitBreakerMaxFailedCalls, logger, this.circuitBreakerStateChangedCallback, this.circuitBreakerInitialState);
+            this.proxies[this.circuitBreakerPosition] = new CircuitBreakerProxy(this.circuitBreakerBreakDurationMs, this.circuitBreakerMaxFailedCalls, this.circuitBreakerLeakTimeSpanInMilliSeconds, logger, this.circuitBreakerStateChangedCallback, this.circuitBreakerInitialState);
         }
 
         if (this.retryIncluded) {

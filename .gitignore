@@ -15,12 +15,12 @@
 .project
 .classpath
 .c9/
-*.launch
+#*.launch
 .settings/
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/*
+#.vscode/*
 
 # misc
 junit.xml
@@ -365,8 +365,8 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-/sources/.vscode/tasks.json
-/sources/.vscode/launch.json
+#/sources/.vscode/tasks.json
+#/sources/.vscode/launch.json
 
 # ignore launchSettings of test projects
 **/*Test/Properties/launchSettings.json

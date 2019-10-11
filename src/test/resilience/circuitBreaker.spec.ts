@@ -17,7 +17,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 5;
             const initialState = CircuitBreakerState.Close;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 return successMessage;
             };
@@ -34,7 +35,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 5;
             const initialState = CircuitBreakerState.HalfOpen;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 return successMessage;
             };
@@ -52,7 +54,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 1;
             const initialState = CircuitBreakerState.Open;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 throw new Error(errorMessage);
             };
@@ -68,7 +71,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 5;
             const initialState = CircuitBreakerState.HalfOpen;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 throw new Error(errorMessage);
             };
@@ -84,7 +88,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 5;
             const initialState = CircuitBreakerState.Open;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 throw new Error(errorMessage);
             };
@@ -100,7 +105,8 @@ describe("Resilence", () => {
             const breakDuration = TimeSpansInMilliSeconds.OneSecond;
             const maxFailedCalls = 5;
             const initialState = CircuitBreakerState.Open;
-            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, logger, null, initialState);
+            const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes;
+            const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null, initialState);
             const func = async (): Promise<string> => {
                 return successMessage;
             };
