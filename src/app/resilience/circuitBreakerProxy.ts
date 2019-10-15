@@ -5,6 +5,7 @@ import { ILogger } from "../contracts/logger";
 import { Guard } from "../utils/guard";
 import { logFormatter } from "./utils";
 import { LeakingBucket } from "./leakingBucket";
+import { Guid } from "guid-typescript";
 
 /**
  * A circuit breaker to protect a caller from failing resources.
@@ -76,9 +77,10 @@ export class CircuitBreakerProxy implements IResilienceProxy {
     /**
      * Updates the internal state.
      * @param newState The new state.
+     * @param guid Request Guid.
      */
-    public setState(newState: CircuitBreakerState): void {
-        this.logger.warning(`Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
+    public setState(newState: CircuitBreakerState, guid?: Guid): void {
+        this.logger.warning(guid, `Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
         this.state = newState;
         if (this.stateChangedCallback) {
             this.stateChangedCallback(newState);
@@ -86,38 +88,39 @@ export class CircuitBreakerProxy implements IResilienceProxy {
     }
 
     /**
-     * Clears all entries of the leaking bucket, this means resetting error count to zero.
+     * Reset error count to zero.
      */
-    public bucketClear(): void {
-        this.logger.information("Cleared leaking bucket of circuit breaker", null, logFormatter);
+    public resetErrorCount(): void {
+        this.logger.warning(null, "Maintenance: CircuitBreaker reset error count to zero", null, logFormatter);
         this.bucket.clear();
     }
 
     /**
      * Executes a function within a circuit breaker proxy.
      * @param func Function to execute within the circuit breaker proxy.
+     * @param guid Request Guid.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>): Promise<TResult> {
-        this.logger.trace(`Calling Circuit Breaker in '${this.state}' state.`, null, logFormatter);
+    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, guid: Guid): Promise<TResult> {
+        this.logger.trace(guid, `Circuit Breaker in '${this.state}' state.`, null, logFormatter);
         switch (this.state) {
             case CircuitBreakerState.Close:
-                const handleClose = await this.callFunc<TResult>(func, false);
+                const handleClose = await this.callFunc<TResult>(func, false, guid);
                 const successClose = handleClose[0];
                 if (successClose) {
                     return handleClose[1];
                 } else {
-                    const error = this.handleError(handleClose[2], false);
+                    const error = this.handleError(handleClose[2], false, guid);
                     this.currentError = error;
                     throw error;
                 }
 
             case CircuitBreakerState.HalfOpen:
-                const handleHalfOpen = await this.callFunc<TResult>(func, true);
+                const handleHalfOpen = await this.callFunc<TResult>(func, true, guid);
                 const successHalfOpen = handleHalfOpen[0];
                 if (successHalfOpen) {
                     return handleHalfOpen[1];
                 } else {
-                    const error = this.handleError(handleHalfOpen[2], true);
+                    const error = this.handleError(handleHalfOpen[2], true, guid);
                     this.currentError = error;
                     throw error;
                 }
@@ -127,11 +130,11 @@ export class CircuitBreakerProxy implements IResilienceProxy {
                 const exp = this.openExpiration.getTime();
                 if (now > exp) {
                     this.openExpiration = new Date();
-                    this.setState(CircuitBreakerState.HalfOpen);
-                    return await this.execute(func);
+                    this.setState(CircuitBreakerState.HalfOpen, guid);
+                    return await this.execute(func, guid);
                 } else {
-                    const text = `Circuit Breaker is in open state. Func will be tried again after '${this.openExpiration}'.`;
-                    this.logger.debug(text, null, logFormatter);
+                    const text = `Circuit Breaker is in open state. ${guid || "Func"} will be tried again after '${this.openExpiration}'.`;
+                    this.logger.debug(guid, text, null, logFormatter);
                     throw new CircuitBreakerError(text, this.currentError);
                 }
         }
@@ -141,23 +144,24 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      * Handles the call to the real function in the circuit breaker.
      * @param func The real func to call.
      * @param wasHalfOpen Flag if circuit breaker is currently in half open state.
+     * @param guid Request Guid.
      */
-    private async callFunc<TResult>(func: (...args: any[]) => Promise<TResult>, wasHalfOpen: boolean): Promise<[boolean, TResult, Error]> {
+    private async callFunc<TResult>(func: (...args: any[]) => Promise<TResult>, wasHalfOpen: boolean, guid: Guid): Promise<[boolean, TResult, Error]> {
         let result: TResult;
         let success: boolean;
         let error: Error;
         try {
             result = await func();
             success = true;
-            this.logger.debug(`Func in Circuit Breaker called succesfully.`, null, logFormatter);
+            this.logger.debug(guid, ` in Circuit Breaker called succesfully.`, null, logFormatter);
             if (wasHalfOpen) {
                 this.bucket.clear();
-                this.setState(CircuitBreakerState.Close);
+                this.setState(CircuitBreakerState.Close, guid);
             }
         } catch (e) {
             success = false;
             error = e;
-            this.logger.debug(`Func in Circuit Breaker failed with '${error.message}'.`, null, logFormatter);
+            this.logger.debug(guid, ` in Circuit Breaker failed with '${error.message}'.`, null, logFormatter);
         }
 
         const response: [boolean, TResult, Error] = [success, result, error];
@@ -168,16 +172,17 @@ export class CircuitBreakerProxy implements IResilienceProxy {
      * Handles the error if a func call failed.
      * @param error Error that has occured during the func call.
      * @param wasHalfOpen Flag if circuit breaker was currently half open.
+     * @param guid Request Guid.
      * @returns The error to return to the caller.
      */
-    private handleError(error: Error, wasHalfOpen: boolean): Error {
+    private handleError(error: Error, wasHalfOpen: boolean, guid: Guid): Error {
         this.bucket.insert(new Date());
         if (this.bucket.isFull() || wasHalfOpen) {
             const expiration = new Date();
             expiration.setMilliseconds(expiration.getMilliseconds() + this.breakDurationMs);
             this.openExpiration = expiration;
-            this.logger.debug(`Circuit Breaker expiration set to '${expiration}'.`, null, logFormatter);
-            this.setState(CircuitBreakerState.Open);
+            this.logger.debug(guid, `Circuit Breaker expiration set to '${expiration}'.`, null, logFormatter);
+            this.setState(CircuitBreakerState.Open, guid);
         }
 
         return new CircuitBreakerError("An error occured during execution of function in Circuit Breaker", error);

@@ -1,4 +1,5 @@
 import { IResilienceProxy } from "../contracts/resilienceProxy";
+import { Guid } from "guid-typescript";
 
 /**
  * An item in the resilience pipeline.
@@ -26,15 +27,16 @@ export class PipelineItem implements IResilienceProxy {
     /**
      * Executes a function within a resilience proxy.
      * @param func Function to execute within the resilience proxy.
+     * @param guid Request Guid.
      * @returns The result of the executed function.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>): Promise<TResult> {
+    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, guid: Guid): Promise<TResult> {
         if (this.previous) {
-            const previousResult = async () => this.previous.execute(func);
-            const result = await this.proxy.execute(previousResult);
+            const previousResult = async () => this.previous.execute(func, guid);
+            const result = await this.proxy.execute(previousResult, guid);
             return result;
         } else {
-            const result = await this.proxy.execute(func);
+            const result = await this.proxy.execute(func, guid);
             return result;
         }
     }

@@ -4,6 +4,7 @@ import { ResilientPipelineBuilder } from "../app/resilientPipelineBuilder";
 import { NoLogger } from "../app/logging/noLogger";
 import { RetryProxy } from "../app/resilience/retryProxy";
 import { TimeSpansInMilliSeconds } from "../app/utils/timespans";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -24,7 +25,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await pipeline.execute(func);
+            const result = await pipeline.execute(func, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -46,7 +47,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(pipeline.execute(func)).to.be.rejectedWith(Error);
+            await expect(pipeline.execute(func, Guid.createEmpty())).to.be.rejectedWith(Error);
         });
         it("Should throw error on doubled positions in circuit breaker", (done) => {
             // Arrange

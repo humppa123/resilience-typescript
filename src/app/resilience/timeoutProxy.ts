@@ -3,6 +3,7 @@ import { TimeoutError } from "./timeoutError";
 import { Guard } from "../utils/guard";
 import { ILogger } from "../contracts/logger";
 import { logFormatter } from "./utils";
+import { Guid } from "guid-typescript";
 
 /**
  * A resiliency proxy that checks if a function returns in a given time or throws a timeout error.
@@ -33,28 +34,29 @@ export class TimeoutProxy implements IResilienceProxy {
     /**
      * Executes a function within a resilience proxy.
      * @param func Function to execute within the resilience proxy.
+     * @param guid Request Guid.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>): Promise<TResult> {
+    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, guid: Guid): Promise<TResult> {
         let id: NodeJS.Timeout;
 
-        this.logger.trace(`Starting Timeout`, null, logFormatter);
+        this.logger.trace(guid, `Starting Timeout`, null, logFormatter);
         return Promise.race<TResult>([
             func(),
             new Promise<TResult>((resolve, reject) => {
             id = setTimeout(() => {
                 const timeoutError = new TimeoutError(`Timeout occurred after ${this.timeoutMs}ms`);
-                this.logger.error(null, timeoutError, logFormatter);
+                this.logger.error(guid, null, timeoutError, logFormatter);
                 reject(timeoutError);
             }, this.timeoutMs);
             }),
         ]).then((v) => {
             clearTimeout(id);
-            this.logger.trace(`Timeout successful`, null, logFormatter);
+            this.logger.trace(guid, `Timeout successful`, null, logFormatter);
             return v;
         }, (err) => {
             clearTimeout(id);
-            this.logger.error(`Function provided in Timeout failed`, err, logFormatter);
-            throw new TimeoutError(`Function provided in Timeout failed`, err);
+            this.logger.error(guid, `Timeout`, err, logFormatter);
+            throw new TimeoutError(`Timeout`, err);
         });
     }
 }

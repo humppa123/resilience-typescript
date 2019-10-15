@@ -10,6 +10,7 @@ import { getUrlFromAxisRequest } from "../logging/utils";
 import { logFormatter } from "../resilience/utils";
 import { timer } from "../utils/timer";
 import { IMaintance } from "../contracts/maintenance";
+import { Guid } from "guid-typescript";
 
 /**
  * A web pipeline proxy.
@@ -75,8 +76,9 @@ export class WebPipelineProxy implements IResilienceWebProxy {
             request.baseURL = this.baseUrl;
         }
 
+        const guid = Guid.create();
         if (this.tokenCache) {
-            const token = await this.tokenCache.getToken();
+            const token = await this.tokenCache.getToken(guid);
             if (request.headers) {
                 request.headers.Authorization = `Bearer ${token.accessToken}`;
             } else {
@@ -86,18 +88,18 @@ export class WebPipelineProxy implements IResilienceWebProxy {
 
         let result: axios.AxiosResponse<TResult>;
         if (this.logger) {
-            this.logger.debug(`Requesting '${getUrlFromAxisRequest(request)}'`, null, logFormatter);
+            this.logger.information(guid, `start ${request.method.toUpperCase()} '${getUrlFromAxisRequest(request)}'`, null, logFormatter);
         }
 
         const durationTimer = timer();
         if ((this.itemCache && cacheKey) && this.pipeline) {
-            result = await this.itemCache.execute(() => this.pipeline.execute(() => Axios(request)), cacheKey);
+            result = await this.itemCache.execute(() => this.pipeline.execute(() => Axios(request), guid), cacheKey);
         } else {
             if ((this.itemCache && cacheKey) && !this.pipeline) {
                 result = await this.itemCache.execute(() => Axios(request), cacheKey);
             } else {
                 if (this.pipeline) {
-                    result = await this.pipeline.execute(() => Axios(request));
+                    result = await this.pipeline.execute(() => Axios(request), guid);
                 } else {
                     result = await Axios(request);
                 }
@@ -106,7 +108,7 @@ export class WebPipelineProxy implements IResilienceWebProxy {
 
         const milliseconds = durationTimer.milliSeconds;
         if (this.logger) {
-            this.logger.debug(`Request '${getUrlFromAxisRequest(request)}' finished within ${milliseconds}ms`, null, logFormatter);
+            this.logger.information(guid, `end ${result.status} in ${milliseconds}ms`, null, logFormatter);
         }
 
         return result;

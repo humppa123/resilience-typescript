@@ -5,6 +5,7 @@ import { sleepAndReject } from "../../app/resilience/utils";
 import { TimeoutProxy } from "../../app/resilience/timeoutProxy";
 import { NoLogger } from "../../app/logging/noLogger";
 import { TimeSpansInMilliSeconds } from "../../app/utils/timespans";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -19,7 +20,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(timeout.execute(() => sleepAndReject(sleep))).to.be.rejectedWith(TimeoutError);
+            await expect(timeout.execute(() => sleepAndReject(sleep), Guid.createEmpty())).to.be.rejectedWith(TimeoutError);
         });
         it("Should succeed if func is faster than timeout", async () => {
             // Arrange
@@ -31,7 +32,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await timeout.execute(fasterHarderScooter);
+            const result = await timeout.execute(fasterHarderScooter, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -47,7 +48,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(timeout.execute(fasterHarderScooter)).to.be.rejectedWith(TimeoutError);
+            await expect(timeout.execute(fasterHarderScooter, Guid.createEmpty())).to.be.rejectedWith(TimeoutError);
         });
     });
 });

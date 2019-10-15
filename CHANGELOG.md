@@ -9,6 +9,7 @@ This version includes **breaking API changes**
 * Simplified memory cache by using a new cache entry model.
 * Circuit Breaker has now a leaking bucket algorithm to take note of failures.
 * Maintenance mode added to all pipelines.
+* Added a unique Id to all requests for better logging information.
 
 ## 1.2.2 - 2019.09.30
 

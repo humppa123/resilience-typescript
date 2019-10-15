@@ -3,6 +3,7 @@ import chaiAsPromised = require("chai-as-promised");
 import { RetryProxy } from "../../app/resilience/retryProxy";
 import { RetryError } from "../../app/resilience/retryError";
 import { NoLogger } from "../../app/logging/noLogger";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -20,7 +21,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(retry.execute(fails)).to.be.rejectedWith(RetryError);
+            await expect(retry.execute(fails, Guid.createEmpty())).to.be.rejectedWith(RetryError);
         });
         it("Should succeed if last try is successful", async () => {
             // Arrange
@@ -40,7 +41,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await retry.execute(successOnLastTry);
+            const result = await retry.execute(successOnLastTry, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -59,7 +60,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await retry.execute(successOnFirstTry);
+            const result = await retry.execute(successOnFirstTry, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);

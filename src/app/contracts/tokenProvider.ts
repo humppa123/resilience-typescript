@@ -1,4 +1,5 @@
 import { Token } from "../tokenCache/token";
+import { Guid } from "guid-typescript";
 
 /**
  * An access token provider.
@@ -6,7 +7,8 @@ import { Token } from "../tokenCache/token";
 export interface ITokenProvider {
     /**
      * Gets an access token.
+     * @param Request Guid.
      * @returns An access token.
      */
-    getToken(): Promise<Token>;
+    getToken(guid?: Guid): Promise<Token>;
 }

@@ -1,6 +1,5 @@
 import { AbstractMaintenanceItem } from "./abstractMaintenanceItem";
 import { IResilienceProxy } from "../contracts/resilienceProxy";
-import { Guard } from "../utils/guard";
 import { CircuitBreakerState } from "../resilience/circuitBreakerState";
 import { CircuitBreakerProxy } from "../resilience/circuitBreakerProxy";
 import { ICircuitBreakerMaintenance } from "../contracts/circuitBreakerMaintenance";
@@ -24,7 +23,7 @@ export class CircuitBreakerMaintenance extends AbstractMaintenanceItem implement
     public setState(state: CircuitBreakerState): void {
         for (const proxy of this.proxies) {
             const circuitBreaker = proxy as CircuitBreakerProxy;
-            if (circuitBreaker) {
+            if (circuitBreaker && typeof circuitBreaker.resetErrorCount === "function") {
                 circuitBreaker.setState(state);
             }
         }
@@ -50,8 +49,8 @@ export class CircuitBreakerMaintenance extends AbstractMaintenanceItem implement
     public resetErrorCount(): void {
         for (const proxy of this.proxies) {
             const circuitBreaker = proxy as CircuitBreakerProxy;
-            if (circuitBreaker) {
-                circuitBreaker.bucketClear();
+            if (circuitBreaker && typeof circuitBreaker.resetErrorCount === "function") {
+                circuitBreaker.resetErrorCount();
             }
         }
     }

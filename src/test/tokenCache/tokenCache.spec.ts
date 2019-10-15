@@ -7,6 +7,7 @@ import { Token } from "../../app/tokenCache/token";
 import { ITokenCache } from "../../app/contracts/tokenCache";
 import { DefaultTokenCache } from "../../app/tokenCache/defaultTokenCache";
 import { NoLogger } from "../../app/logging/noLogger";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -19,12 +20,12 @@ describe("Resilence", () => {
             const expires = new Date();
             const token = new Token(accessToken, expires);
             const mock = TypeMoq.Mock.ofType<ITokenProvider>();
-            mock.setup(d => d.getToken()).returns(() => Promise.resolve(token));
+            mock.setup(d => d.getToken(TypeMoq.It.isAny())).returns(() => Promise.resolve(token));
             const cache: ITokenCache = new DefaultTokenCache(mock.object, logger);
 
             // Act
-            const result = await cache.getToken();
-            mock.verify(d => d.getToken(), TypeMoq.Times.once());
+            const result = await cache.getToken(Guid.createEmpty());
+            mock.verify(d => d.getToken(Guid.createEmpty()), TypeMoq.Times.once());
 
             // Assert
             expect(result.accessToken).to.equal(accessToken);
@@ -37,14 +38,14 @@ describe("Resilence", () => {
             expires.setSeconds(expires.getSeconds() + 300);
             const token = new Token(accessToken, expires);
             const mockProvider = TypeMoq.Mock.ofType<ITokenProvider>();
-            mockProvider.setup(d => d.getToken()).returns(() => Promise.resolve(token));
+            mockProvider.setup(d => d.getToken(TypeMoq.It.isAny())).returns(() => Promise.resolve(token));
             const cache: ITokenCache = new DefaultTokenCache(mockProvider.object, logger);
 
             // Act
-            let result = await cache.getToken();
-            result = await cache.getToken();
-            result = await cache.getToken();
-            mockProvider.verify(d => d.getToken(), TypeMoq.Times.once());
+            let result = await cache.getToken(Guid.createEmpty());
+            result = await cache.getToken(Guid.createEmpty());
+            result = await cache.getToken(Guid.createEmpty());
+            mockProvider.verify(d => d.getToken(Guid.createEmpty()), TypeMoq.Times.once());
 
             // Assert
             expect(result.accessToken).to.equal(accessToken);
@@ -57,13 +58,13 @@ describe("Resilence", () => {
             expires.setSeconds(expires.getSeconds() - 30);
             const token = new Token(accessToken, expires);
             const mock = TypeMoq.Mock.ofType<ITokenProvider>();
-            mock.setup(d => d.getToken()).returns(() => Promise.resolve(token));
+            mock.setup(d => d.getToken(TypeMoq.It.isAny())).returns(() => Promise.resolve(token));
             const cache: ITokenCache = new DefaultTokenCache(mock.object, logger);
 
             // Act
-            let result = await cache.getToken();
-            result = await cache.getToken();
-            mock.verify(d => d.getToken(), TypeMoq.Times.atMost(2));
+            let result = await cache.getToken(Guid.createEmpty());
+            result = await cache.getToken(Guid.createEmpty());
+            mock.verify(d => d.getToken(Guid.createEmpty()), TypeMoq.Times.atMost(2));
 
             // Assert
             expect(result.accessToken).to.equal(accessToken);
@@ -76,13 +77,13 @@ describe("Resilence", () => {
             expires.setSeconds(expires.getSeconds() - 40);
             const token = new Token(accessToken, expires);
             const mock = TypeMoq.Mock.ofType<ITokenProvider>();
-            mock.setup(d => d.getToken()).returns(() => Promise.resolve(token));
+            mock.setup(d => d.getToken(TypeMoq.It.isAny())).returns(() => Promise.resolve(token));
             const cache: ITokenCache = new DefaultTokenCache(mock.object, logger);
 
             // Act
-            let result = await cache.getToken();
-            result = await cache.getToken();
-            mock.verify(d => d.getToken(), TypeMoq.Times.atMost(2));
+            let result = await cache.getToken(Guid.createEmpty());
+            result = await cache.getToken(Guid.createEmpty());
+            mock.verify(d => d.getToken(Guid.createEmpty()), TypeMoq.Times.atMost(2));
 
             // Assert
             expect(result.accessToken).to.equal(accessToken);

@@ -1,6 +1,7 @@
 import { LogLevel } from "./logLevel";
 import { getUtcDateTimeString } from "./utils";
 import { AbstractStringLogger } from "./abstractStringLogger";
+import { Guid } from "guid-typescript";
 
 /**
  * A logger that logs to the default console.
@@ -17,11 +18,12 @@ export class ConsoleLogger extends AbstractStringLogger {
     /**
      * The real handler for log entries.
      * @param logLevel Entry will be written on this level.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    protected logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        console.log(`${logLevel.toLocaleUpperCase()}: ${getUtcDateTimeString()} ${formatter(state, error)}`);
+    protected logHandler(logLevel: LogLevel, guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        console.log(`${logLevel.toLocaleUpperCase()}: ${getUtcDateTimeString()} ${formatter(state, guid, error)}`);
     }
 }

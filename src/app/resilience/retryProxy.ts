@@ -3,6 +3,7 @@ import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { Guard } from "../utils/guard";
 import { ILogger } from "../contracts/logger";
 import { logFormatter } from "./utils";
+import { Guid } from "guid-typescript";
 
 /**
  * A resiliency proxy that tries a function n times before failing with a retry error.
@@ -33,22 +34,24 @@ export class RetryProxy implements IResilienceProxy {
     /**
      * Executes a function within a resilience proxy.
      * @param func Function to execute within the resilience proxy.
+     * @param guid Request Guid.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>): Promise<TResult> {
+    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, guid: Guid): Promise<TResult> {
         let innerError: Error;
         for (let i = 0; i < this.retries; i++) {
             try {
-                this.logger.trace(`Starting Retry ${i}`, null, logFormatter);
+                this.logger.trace(guid, `Starting Retry ${i}`, null, logFormatter);
                 const result = await func();
-                this.logger.trace(`Retry ${i} successful`, null, logFormatter);
+                this.logger.trace(guid, `Retry ${i} successful`, null, logFormatter);
                 return result;
             } catch (error) {
-                this.logger.debug(`Retry ${i} failed`, error, logFormatter);
+                this.logger.warning(guid, `Retry ${i} failed`, error, logFormatter);
                 innerError = error;
             }
         }
 
-        this.logger.error(`Retry failed after ${this.retries} times`, innerError, logFormatter);
-        throw new RetryError(`Retries exceeded after ${this.retries} tries`, innerError);
+        const errorMessage = `Retries exceeded after ${this.retries} times`;
+        this.logger.error(guid, errorMessage, innerError, logFormatter);
+        throw new RetryError(errorMessage, innerError);
     }
 }

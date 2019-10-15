@@ -259,7 +259,7 @@ const result = await provider.getToken(); // A valid token for Bearer authorizat
 
 ### Logging
 
-This package contains its own logging mechanism but you can easily include your own logger by extending the `AbstractStringLogger` class, implementing the `protected abstract logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void;` method and calling your own logger inside of it.
+This package contains its own logging mechanism but you can easily include your own logger by extending the `AbstractStringLogger` class, implementing the `protected abstract logHandler(logLevel: LogLevel, guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void;` method and calling your own logger inside of it. The _Guid_ is a unique Id for each request to be able to connect log messages to a specific request.
 
 There are also three predefined logger already included:
 
