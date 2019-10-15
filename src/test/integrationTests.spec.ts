@@ -56,6 +56,37 @@ describe("Resilence", () => {
             expect(person1.firstName.length).to.be.greaterThan(0);
             expect(person1.lastName.length).to.be.greaterThan(0);
         }).timeout(1000 * 60);
+        it("Maintenance", async () => {
+            // Arrange
+            const proxy = ResilientWebPipelineBuilder
+                .New()
+                .useCustomLogger(logger)
+                .useTokenCache(tokenCache)
+                .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, TimeSpansInMilliSeconds.TenMinutes, 10)
+                .useMemoryCache(TimeSpansInMilliSeconds.OneHour)
+                .useBaseUrl(baseUrl)
+                .buildToCrud<Person>();
+
+            // Act
+            const list = await proxy.list("list");
+
+            // Assert
+            expect(list.status).to.equal(200);
+            expect(list.data.length).to.be.greaterThan(0);
+
+            // Act
+            proxy.maintenance()
+                .cache()
+                .clear();
+
+            proxy.maintenance()
+                .circuitBreaker()
+                .resetErrorCount();
+
+            proxy.maintenance()
+                .circuitBreaker()
+                .close();
+        }).timeout(1000 * 60);
         it("CRUD add / delete / get / update", async () => {
             // Arrange
             const proxy = ResilientWebPipelineBuilder

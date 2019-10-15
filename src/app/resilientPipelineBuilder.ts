@@ -236,10 +236,10 @@ export class ResilientPipelineBuilder {
     }
 
     /**
-     * Builds the resilience pipeline.
-     * @returns The resilience pipeline.
+     * Builds to list of proxies.
+     * @returns List of proxies.
      */
-    public build(): IResilienceProxy {
+    public buildToList(): IResilienceProxy[] {
         const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         if (this.circuitBreakerIncluded) {
             this.proxies[this.circuitBreakerPosition] = new CircuitBreakerProxy(this.circuitBreakerBreakDurationMs, this.circuitBreakerMaxFailedCalls, this.circuitBreakerLeakTimeSpanInMilliSeconds, logger, this.circuitBreakerStateChangedCallback, this.circuitBreakerInitialState);
@@ -264,6 +264,15 @@ export class ResilientPipelineBuilder {
             sortedProxies.push(this.proxies[key]);
         }
 
+        return sortedProxies;
+    }
+
+    /**
+     * Builds the resilience pipeline.
+     * @returns The resilience pipeline.
+     */
+    public build(): IResilienceProxy {
+        const sortedProxies = this.buildToList();
         return new PipelineProxy(sortedProxies);
     }
 

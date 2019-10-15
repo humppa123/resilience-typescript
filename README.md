@@ -115,6 +115,31 @@ request.url = "https://resilience-typescript.azurewebsites.net/api/persons";
 const list = await proxy.execute<Person[]>(request);
 ```
 
+### Maintenance
+
+Each of the builders above have a maintenace mode, where you can perform the following maintenance operations:
+
+* Remove all entries of a memory cache
+* Set the circuit breaker to a desired state
+* Reset error count to zero for circuit breakers.
+
+```typescript
+// Clear all entries of a memory state.
+proxy.maintenance()
+    .cache()
+    .clear();
+
+// Reset error count to zero of circuit breakers.
+proxy.maintenance()
+    .circuitBreaker()
+    .resetErrorCount();
+
+// Close the circuit breakers.
+proxy.maintenance()
+    .circuitBreaker()
+    .close();
+```
+
 ## Components
 
 ### Pipeline

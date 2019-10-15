@@ -1,4 +1,5 @@
 import axios = require("axios");
+import { IMaintance } from "./maintenance";
 
 /**
  * A basic CRUD web resilience proxy.
@@ -40,4 +41,10 @@ export interface IResilienceCrudWebProxy<T> {
      * @returns Web response.
      */
     update(id: string, item: T): Promise<axios.AxiosResponse<T>>;
+
+    /**
+     * Gets the maintenance.
+     * @returns Maintenance for the pipeline.
+     */
+    maintenance(): IMaintance;
 }

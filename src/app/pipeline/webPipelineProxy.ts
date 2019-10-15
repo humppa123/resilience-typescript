@@ -9,6 +9,7 @@ import { ILogger } from "../contracts/logger";
 import { getUrlFromAxisRequest } from "../logging/utils";
 import { logFormatter } from "../resilience/utils";
 import { timer } from "../utils/timer";
+import { IMaintance } from "../contracts/maintenance";
 
 /**
  * A web pipeline proxy.
@@ -34,6 +35,10 @@ export class WebPipelineProxy implements IResilienceWebProxy {
      * Gets the logger.
      */
     private readonly logger: ILogger<string>;
+    /**
+     * Gets the maintenance.
+     */
+    private readonly maint: IMaintance;
 
     /**
      * Initializes a new instance of the @see WebPipelineProxy class.
@@ -42,13 +47,15 @@ export class WebPipelineProxy implements IResilienceWebProxy {
      * @param tokenCache The token cache to use if any.
      * @param baseUrl The base URL to use if any.
      * @param logger Logger to use if any.
+     * @param maintenance Maintenance for pipepline.
      */
-    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null, logger: ILogger<string> = null) {
+    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null, logger: ILogger<string> = null, maintenance: IMaintance = null) {
         this.pipeline = pipeline;
         this.tokenCache = tokenCache;
         this.itemCache = itemCache;
         this.baseUrl = baseUrl;
         this.logger = logger;
+        this.maint = maintenance;
     }
 
     /**
@@ -103,5 +110,15 @@ export class WebPipelineProxy implements IResilienceWebProxy {
         }
 
         return result;
+    }
+
+    /**
+     * Gets the maintenance.
+     * @returns Maintenance for the pipeline.
+     */
+    public maintenance(): IMaintance {
+        Guard.throwIfNullOrEmpty(this.maint, "this.maint");
+
+        return this.maint;
     }
 }

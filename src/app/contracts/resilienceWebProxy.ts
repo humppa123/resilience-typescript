@@ -1,4 +1,5 @@
 import axios = require("axios");
+import { IMaintance } from "./maintenance";
 
 /**
  * A proxy for a cached web resiliency operation.
@@ -11,4 +12,10 @@ export interface IResilienceWebProxy {
      * @returns The result of the executed function.
      */
     execute<TResult>(request: axios.AxiosRequestConfig, cacheKey?: string): Promise<axios.AxiosResponse<TResult>>;
+
+    /**
+     * Gets the maintenance.
+     * @returns Maintenance for the pipeline.
+     */
+    maintenance(): IMaintance;
 }
