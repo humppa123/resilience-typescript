@@ -4,6 +4,7 @@ import { Token } from "./token";
 import { Guard } from "../utils/guard";
 import { ILogger } from "../contracts/logger";
 import { logFormatter } from "../resilience/utils";
+import { Guid } from "guid-typescript";
 
 /**
  * The default token cache implementation.
@@ -37,13 +38,13 @@ export class DefaultTokenCache implements ITokenCache {
     /**
      * Gets an access token.
      */
-    public async getToken(): Promise<Token> {
-        this.logger.trace(`Requesting token from cache`, null, logFormatter);
+    public async getToken(guid?: Guid): Promise<Token> {
+        this.logger.trace(guid, `Requesting token from cache`, null, logFormatter);
         if (!this.token || this.hasExpired(this.token)) {
-            this.logger.warning(`Token in cache empty or expired, requesting new from provider`, null, logFormatter);
-            this.token = await this.provider.getToken();
+            this.logger.warning(guid, `Token in cache empty or expired, requesting new from provider`, null, logFormatter);
+            this.token = await this.provider.getToken(guid);
         } else {
-            this.logger.trace(`Using token from cache`, null, logFormatter);
+            this.logger.trace(guid, `Using token from cache`, null, logFormatter);
         }
 
         return this.token;

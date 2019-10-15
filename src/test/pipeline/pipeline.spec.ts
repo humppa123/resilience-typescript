@@ -4,6 +4,7 @@ import { IResilienceProxy } from "../../app/contracts/resilienceProxy";
 import { PassThroughProxy } from "../../app/resilience/passThroughProxy";
 import { PipelineProxy } from "../../app/pipeline/pipelineProxy";
 import { ErrorProxy } from "../../app/resilience/errorProxy";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -22,7 +23,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await pipeline.execute(func);
+            const result = await pipeline.execute(func, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -41,7 +42,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(pipeline.execute(func)).to.be.rejectedWith(Error);
+            await expect(pipeline.execute(func, Guid.createEmpty())).to.be.rejectedWith(Error);
         });
         it("Should throw error if func rejects on any proxy.", async () => {
             // Arrange
@@ -57,7 +58,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(pipeline.execute(func)).to.be.rejectedWith(Error);
+            await expect(pipeline.execute(func, Guid.createEmpty())).to.be.rejectedWith(Error);
         });
         it("Should throw error if func rejects on first proxy.", async () => {
             // Arrange
@@ -73,7 +74,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(pipeline.execute(func)).to.be.rejectedWith(Error);
+            await expect(pipeline.execute(func, Guid.createEmpty())).to.be.rejectedWith(Error);
         });
     });
 });

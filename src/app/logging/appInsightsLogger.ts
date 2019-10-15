@@ -3,6 +3,7 @@ import { AbstractStringLogger } from "./abstractStringLogger";
 import appInsights = require("applicationinsights");
 import { TraceTelemetry, SeverityLevel } from "applicationinsights/out/Declarations/Contracts";
 import { ArgumentError } from "../utils/argumentError";
+import { Guid } from "guid-typescript";
 
 /**
  * Logger that logs to Azure Application Insights
@@ -26,13 +27,14 @@ export class AppInsightsLogger extends AbstractStringLogger {
     /**
      * The real handler for log entries.
      * @param logLevel Entry will be written on this level.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    protected logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void {
+    protected logHandler(logLevel: LogLevel, guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
         const telemetry: TraceTelemetry = {
-            message: formatter(state, error),
+            message: formatter(state, guid, error),
             severity: AppInsightsLogger.logLevelToSeverityLevel(logLevel)
         };
 

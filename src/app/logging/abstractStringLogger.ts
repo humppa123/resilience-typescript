@@ -1,5 +1,6 @@
 import { LogLevel } from "./logLevel";
 import { ILogger } from "../contracts/logger";
+import { Guid } from "guid-typescript";
 
 /**
  * Base class for all string loggers.
@@ -21,84 +22,92 @@ export abstract class AbstractStringLogger implements ILogger<string> {
     /**
      * Writes a log entry.
      * @param logLevel Entry will be written on this level.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public log(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void {
+    public log(logLevel: LogLevel, guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
         if (this.isInLogLevel(logLevel)) {
-            this.logHandler(logLevel, state, error, formatter);
+            this.logHandler(logLevel, guid, state, error, formatter);
         }
     }
 
     /**
      * Writes a trace log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public trace(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Trace, state, error, formatter);
+    public trace(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Trace, guid, state, error, formatter);
     }
 
     /**
      * Writes a debug log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public debug(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Debug, state, error, formatter);
+    public debug(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Debug, guid, state, error, formatter);
     }
 
     /**
      * Writes an information log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public information(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Information, state, error, formatter);
+    public information(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Information, guid, state, error, formatter);
     }
 
     /**
      * Writes a warning log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public warning(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Warning, state, error, formatter);
+    public warning(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Warning, guid, state, error, formatter);
     }
 
     /**
      * Writes an error log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public error(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Error, state, error, formatter);
+    public error(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Error, guid, state, error, formatter);
     }
 
     /**
      * Writes a critical log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public critical(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.Critical, state, error, formatter);
+    public critical(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.Critical, guid, state, error, formatter);
     }
 
     /**
      * Writes a none log entry.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    public none(state: string, error: Error, formatter: (s: string, e: Error) => string): void {
-        this.log(LogLevel.None, state, error, formatter);
+    public none(guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void {
+        this.log(LogLevel.None, guid, state, error, formatter);
     }
 
     /**
@@ -179,9 +188,10 @@ export abstract class AbstractStringLogger implements ILogger<string> {
     /**
      * The real handler for log entries.
      * @param logLevel Entry will be written on this level.
+     * @param guid Guid of the request.
      * @param state The entry to be written. Can be also an object.
      * @param error The error related to this entry.
      * @param formatter Function to create a string message of the state and error.
      */
-    protected abstract logHandler(logLevel: LogLevel, state: string, error: Error, formatter: (s: string, e: Error) => string): void;
+    protected abstract logHandler(logLevel: LogLevel, guid: Guid, state: string, error: Error, formatter: (s: string, guid: Guid, e: Error) => string): void;
 }

@@ -9,6 +9,7 @@ import { ConsoleLogger } from "../app/logging/consoleLogger";
 import { DefaultTokenCache } from "../app/tokenCache/defaultTokenCache";
 import { Person } from "./person";
 import { AxiosRequestConfig } from "axios";
+import { LogLevel } from "../app/logging/logLevel";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -18,7 +19,7 @@ describe("Resilence", () => {
         const clientId = "1064ad5e-e258-4793-b423-a786249030fc";
         const clientSecret = "*/eP=0s?v7QXRQR3sSNCJtPi2e=:Mj[l"; // Can be shared as only for integration tests and rate limited!!!
         const tenantId = "dc003016-66b7-4b23-a84d-9a44be793cf0";
-        const logger = new NoLogger();
+        const logger = new ConsoleLogger(LogLevel.Information);
         const tokenProvider: ITokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrlToken, clientId, clientSecret, tenantId, logger);
         const tokenCache = new DefaultTokenCache(tokenProvider, logger);
         const baseUrl = "https://resilience-typescript.azurewebsites.net/api/persons";
@@ -63,6 +64,7 @@ describe("Resilence", () => {
                 .useCustomLogger(logger)
                 .useTokenCache(tokenCache)
                 .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, TimeSpansInMilliSeconds.TenMinutes, 10)
+                .useRetry(2, 30)
                 .useMemoryCache(TimeSpansInMilliSeconds.OneHour)
                 .useBaseUrl(baseUrl)
                 .buildToCrud<Person>();

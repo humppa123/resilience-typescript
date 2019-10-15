@@ -1,6 +1,7 @@
 import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { Guard } from "../utils/guard";
 import { PipelineItem } from "./PipelineItem";
+import { Guid } from "guid-typescript";
 
 /**
  * A pipeline that combies multiple resilience proxies.
@@ -24,9 +25,10 @@ export class PipelineProxy implements IResilienceProxy {
     /**
      * Executes a function within a resilience proxy.
      * @param func Function to execute within the resilience proxy.
+     * @param guid Request Guid.
      */
-    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>): Promise<TResult> {
-        const result = await this.start.execute(func);
+    public async execute<TResult>(func: (...args: any[]) => Promise<TResult>, guid: Guid): Promise<TResult> {
+        const result = await this.start.execute(func, guid);
         return result;
     }
 

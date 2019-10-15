@@ -7,6 +7,7 @@ import { Guard } from "../utils/guard";
 import { AzureAdAppRegistrationToken } from "./azureAdAppRegistrationToken";
 import { ILogger } from "../contracts/logger";
 import { logFormatter } from "../resilience/utils";
+import { Guid } from "guid-typescript";
 
 /**
  * Token provider for an Azure Active Directory App Registration.
@@ -64,15 +65,16 @@ export class AzureActiveDirectoryAppRegistrationTokenProvider implements ITokenP
 
     /**
      * Gets an access token.
+     * @param guid Request Guid.
      * @returns An access token.
      */
-    public async getToken(): Promise<Token> {
-        this.logger.trace(`Requesting token for Azure Ad App ${this.clientId} in Tenant ${this.tenantId}`, null, logFormatter);
+    public async getToken(guid?: Guid): Promise<Token> {
+        this.logger.trace(guid, `Requesting token for Azure Ad App ${this.clientId} in Tenant ${this.tenantId}`, null, logFormatter);
         const response = await Axios.post<AzureAdAppRegistrationToken>(`${this.tenantId}/oauth2/v2.0/token`, this.request, this.requestOptions);
         const aadToken = response.data;
         const expires = new Date();
         expires.setSeconds(expires.getUTCSeconds() + aadToken.expires_in);
-        this.logger.trace(`Token for Azure Ad App ${this.clientId} received, valid until ${expires.toUTCString()}`, null, logFormatter);
+        this.logger.trace(guid, `Token for Azure Ad App ${this.clientId} received, valid until ${expires.toUTCString()}`, null, logFormatter);
         return new Token(aadToken.access_token, expires);
     }
 }

@@ -2,6 +2,7 @@ import chai = require("chai");
 import chaiAsPromised = require("chai-as-promised");
 import { LogLevel } from "../../app/logging/logLevel";
 import { TestLogger } from "../../app/logging/testLogger";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -208,16 +209,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Trace;
             const expectedState = "This is the log state Trace";
             const expectedError = new Error("This is the error message Trace");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.trace(expectedState, expectedError, null);
+            logger.trace(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'Debug' level", () => {
             // Arrange
@@ -225,16 +228,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Debug;
             const expectedState = "This is the log state Debug";
             const expectedError = new Error("This is the error message Debug");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.debug(expectedState, expectedError, null);
+            logger.debug(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'Information' level", () => {
             // Arrange
@@ -242,16 +247,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Information;
             const expectedState = "This is the log state Information";
             const expectedError = new Error("This is the error message Information");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.information(expectedState, expectedError, null);
+            logger.information(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'Warning' level", () => {
             // Arrange
@@ -259,16 +266,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Warning;
             const expectedState = "This is the log state Warning";
             const expectedError = new Error("This is the error message Warning");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.warning(expectedState, expectedError, null);
+            logger.warning(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'Error' level", () => {
             // Arrange
@@ -276,16 +285,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Error;
             const expectedState = "This is the log state Error";
             const expectedError = new Error("This is the error message Error");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.error(expectedState, expectedError, null);
+            logger.error(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'Critical' level", () => {
             // Arrange
@@ -293,16 +304,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.Critical;
             const expectedState = "This is the log state Critical";
             const expectedError = new Error("This is the error message Critical");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.critical(expectedState, expectedError, null);
+            logger.critical(expectedGuid, expectedState, expectedError, null);
         });
         it("Should return log entry correctly on 'None' level", () => {
             // Arrange
@@ -310,16 +323,18 @@ describe("Resilence", () => {
             const expectedLogLevel = LogLevel.None;
             const expectedState = "This is the log state None";
             const expectedError = new Error("This is the error message None");
-            const callback = (logLevel: LogLevel, state: string, error: Error) => {
+            const expectedGuid = Guid.create();
+            const callback = (logLevel: LogLevel, guid: Guid, state: string, error: Error) => {
                 // Assert
                 expect(logLevel).to.equal(expectedLogLevel);
                 expect(state).to.equal(expectedState);
                 expect(error.message).to.equal(expectedError.message);
+                expect(guid.toString()).to.equal(expectedGuid.toString());
             };
             const logger = new TestLogger(minimumLogLevel, callback);
 
             // Act
-            logger.none(expectedState, expectedError, null);
+            logger.none(expectedGuid, expectedState, expectedError, null);
         });
     });
 });

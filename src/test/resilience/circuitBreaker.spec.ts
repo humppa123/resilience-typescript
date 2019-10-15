@@ -5,6 +5,7 @@ import { TimeSpansInMilliSeconds } from "../../app/utils/timespans";
 import { CircuitBreakerProxy } from "../../app/resilience/circuitBreakerProxy";
 import { CircuitBreakerState } from "../../app/resilience/circuitBreakerState";
 import { CircuitBreakerError } from "../../app/resilience/circuitBreakerError";
+import { Guid } from "guid-typescript";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -24,7 +25,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await circuitBreaker.execute(func);
+            const result = await circuitBreaker.execute(func, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -42,7 +43,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await circuitBreaker.execute(func);
+            const result = await circuitBreaker.execute(func, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
@@ -62,7 +63,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(circuitBreaker.execute(func)).to.be.rejectedWith(CircuitBreakerError);
+            await expect(circuitBreaker.execute(func, Guid.createEmpty())).to.be.rejectedWith(CircuitBreakerError);
             expect(circuitBreaker.getState()).to.equal(CircuitBreakerState.Open);
         });
         it("Should return error if func rejects and state is half open", async () => {
@@ -79,7 +80,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(circuitBreaker.execute(func)).to.be.rejectedWith(CircuitBreakerError);
+            await expect(circuitBreaker.execute(func, Guid.createEmpty())).to.be.rejectedWith(CircuitBreakerError);
             expect(circuitBreaker.getState()).to.equal(CircuitBreakerState.Open);
         });
         it("Should return error if func rejects and state is open", async () => {
@@ -96,7 +97,7 @@ describe("Resilence", () => {
 
             // Act
             // Assert
-            await expect(circuitBreaker.execute(func)).to.be.rejectedWith(CircuitBreakerError);
+            await expect(circuitBreaker.execute(func, Guid.createEmpty())).to.be.rejectedWith(CircuitBreakerError);
             expect(circuitBreaker.getState()).to.equal(CircuitBreakerState.Open);
         });
         it("Should return result if func resolves and state is open", async () => {
@@ -112,7 +113,7 @@ describe("Resilence", () => {
             };
 
             // Act
-            const result = await circuitBreaker.execute(func);
+            const result = await circuitBreaker.execute(func, Guid.createEmpty());
 
             // Assert
             expect(result).to.equal(successMessage);
