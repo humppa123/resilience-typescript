@@ -20,6 +20,11 @@ import { MultiLogger } from "./logging/multiLogger";
 import { LogLevel } from "./logging/logLevel";
 import { ConsoleLogger } from "./logging/consoleLogger";
 import { AppInsightsLogger } from "./logging/appInsightsLogger";
+import { ICacheMaintenance } from "./contracts/cacheMaintenance";
+import { CacheMaintenance } from "./maintenance/cacheMaintenance.impl";
+import { PipelineProxy } from "./pipeline/pipelineProxy";
+import { Maintenance } from "./maintenance/maintenance.impl";
+import { IMaintance } from "./contracts/maintenance";
 
 /**
  * A builder to create a resilient web pipeline.
@@ -114,7 +119,7 @@ export class ResilientWebPipelineBuilder {
     public build(): IResilienceWebProxy {
         const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         const build = this.prepareBuild(logger);
-        return new WebPipelineProxy(build[0], build[1], build[2], build[3], logger);
+        return new WebPipelineProxy(build[0], build[1], build[2], build[3], logger, build[4]);
     }
 
     /**
@@ -124,7 +129,7 @@ export class ResilientWebPipelineBuilder {
     public buildToCrud<TItem>(): IResilienceCrudWebProxy<TItem> {
         const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         const build = this.prepareBuild(logger);
-        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3], logger);
+        return new CrudWebPipelineProxy(build[0], build[1], build[2], build[3], logger, build[4]);
     }
 
     /**
@@ -135,7 +140,7 @@ export class ResilientWebPipelineBuilder {
         const logger = ResilientPipelineBuilder.prepareLoggers(this.loggers);
         const build = this.prepareBuild(logger);
         const proxy = new WebPipelineProxy(build[0], build[1], build[2], build[3], logger);
-        return new FactoryWebPipelineProxy(proxy);
+        return new FactoryWebPipelineProxy(proxy, build[4]);
     }
 
     /**
@@ -318,16 +323,20 @@ export class ResilientWebPipelineBuilder {
      * @param logger Logger to use.
      * @returns The web pipeline.
      */
-    private prepareBuild(logger: ILogger<string>): [IResilienceProxy, ICache<string, axios.AxiosResponse>, ITokenCache, string] {
+    private prepareBuild(logger: ILogger<string>): [IResilienceProxy, ICache<string, axios.AxiosResponse>, ITokenCache, string, IMaintance] {
         let pipeline: IResilienceProxy;
+        let proxies: IResilienceProxy[];
         if (this.buildPipeline) {
             this.pipelineBuilder.useCustomLogger(logger);
-            pipeline = this.pipelineBuilder.build();
+            proxies = this.pipelineBuilder.buildToList();
+            pipeline = new PipelineProxy(proxies);
         }
 
         let cache: ICache<string, axios.AxiosResponse>;
+        let cacheMaintenance: MemoryCache<axios.AxiosResponse>;
         if (this.buildMemoryCache) {
-            cache = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
+            cacheMaintenance = new MemoryCache<axios.AxiosResponse>(this.memoryCacheExpirationTimespanMs, logger, this.memoryCacheGarbageCollectEveryXRequests, this.memoryCacheMaxEntryCount);
+            cache = cacheMaintenance;
         } else {
             cache = this.customCache;
         }
@@ -340,6 +349,8 @@ export class ResilientWebPipelineBuilder {
             tokenCache = this.customTokenCache;
         }
 
-        return [pipeline, cache, tokenCache, this.baseUrl];
+        const maintenance = new Maintenance(proxies, cacheMaintenance);
+
+        return [pipeline, cache, tokenCache, this.baseUrl, maintenance];
     }
 }

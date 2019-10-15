@@ -33,5 +33,10 @@ export interface IQueue<T> {
      * @param value Item to remove.
      * @return Result of remove operation.
      */
-     remove(value: T): QueuePushResult<T>;
+    remove(value: T): QueuePushResult<T>;
+
+    /**
+     * Clears the queue.
+     */
+    clear();
 }

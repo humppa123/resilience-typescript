@@ -1,14 +1,18 @@
 {
   "name": "resilience-typescript",
   "version": "2.1.0",
-  "description": "SRS Resilience is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
+  "description": "resilience-typescript is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
   "keywords": [
     "Resilience",
+    "Resilient",
     "Timeout",
     "Retry",
     "Token Cache",
     "Circuit Breaker",
-    "Cache"
+    "Cache",
+    "TypeScript",
+    "Axios",
+    "Fluent Language"
   ],
   "homepage": "https://github.com/humppa123/resilience-typescript",
   "bugs": "https://github.com/humppa123/resilience-typescript/issues",

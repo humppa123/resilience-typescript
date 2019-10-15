@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.1 - 2019.10.13
+## 2.1.1 - 2019.10.31
 
 This version includes **breaking API changes**
 
@@ -8,6 +8,7 @@ This version includes **breaking API changes**
 * Added Azure Application Insights Logger
 * Simplified memory cache by using a new cache entry model.
 * Circuit Breaker has now a leaking bucket algorithm to take note of failures.
+* Maintenance mode added to all pipelines.
 
 ## 1.2.2 - 2019.09.30
 

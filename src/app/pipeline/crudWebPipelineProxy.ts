@@ -8,6 +8,7 @@ import { ITokenCache } from "../contracts/tokenCache";
 import { IResilienceCrudWebProxy } from "../contracts/resilienceCrudWebProxy";
 import { ConsoleLogger } from "../logging/consoleLogger";
 import { ILogger } from "../contracts/logger";
+import { IMaintance } from "../contracts/maintenance";
 
 /**
  * A basic CRUD web pipeline proxy.
@@ -20,10 +21,11 @@ export class CrudWebPipelineProxy<T> extends WebPipelineProxy implements IResili
      * @param tokenCache Token cache to use if any.
      * @param baseUrl Base URL to use. Must be set.
      * @param logger Logger to use if any.
+     * @param maintenance Maintenance to use if any.
      */
-    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null, logger: ILogger<string> = null) {
+    constructor(pipeline: IResilienceProxy = null, itemCache: ICache<string, axios.AxiosResponse> = null, tokenCache: ITokenCache = null, baseUrl: string = null, logger: ILogger<string> = null, maintenance: IMaintance = null) {
         Guard.throwIfNullOrEmpty(baseUrl, "baseUrl");
-        super(pipeline, itemCache, tokenCache, baseUrl, logger);
+        super(pipeline, itemCache, tokenCache, baseUrl, logger, maintenance);
     }
 
     /**

@@ -88,4 +88,12 @@ export class MemoryQueue implements IQueue<string> {
 
         return new QueuePushResult(false, undefined);
     }
+
+    /**
+     * Clears the queue.
+     */
+    public clear(): void {
+        this.logger.information("MemoryQueue cleared.", null, logFormatter);
+        this.items.length = 0;
+    }
 }

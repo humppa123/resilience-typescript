@@ -198,6 +198,21 @@ export class MemoryCache<TResult> implements ICache<string, TResult> {
     }
 
     /**
+     * Clears the memory cache.
+     */
+    public clear(): void {
+        this.logger.information("MemoryCache cleared.", null, logFormatter);
+        for (const prop in this.entries) {
+            if (this.entries.hasOwnProperty(prop)) {
+                delete this.entries[prop];
+            }
+        }
+
+        this.garbageCounter = 1;
+        this.queue.clear();
+    }
+
+    /**
      * Removes an item from the cache.
      * @param key Key of the item to remove from the cache.
      * @param removeFromQueue Flag if value should also be removed from the queue.

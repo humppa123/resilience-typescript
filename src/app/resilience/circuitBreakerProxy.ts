@@ -74,6 +74,26 @@ export class CircuitBreakerProxy implements IResilienceProxy {
     }
 
     /**
+     * Updates the internal state.
+     * @param newState The new state.
+     */
+    public setState(newState: CircuitBreakerState): void {
+        this.logger.warning(`Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
+        this.state = newState;
+        if (this.stateChangedCallback) {
+            this.stateChangedCallback(newState);
+        }
+    }
+
+    /**
+     * Clears all entries of the leaking bucket, this means resetting error count to zero.
+     */
+    public bucketClear(): void {
+        this.logger.information("Cleared leaking bucket of circuit breaker", null, logFormatter);
+        this.bucket.clear();
+    }
+
+    /**
      * Executes a function within a circuit breaker proxy.
      * @param func Function to execute within the circuit breaker proxy.
      */
@@ -107,7 +127,7 @@ export class CircuitBreakerProxy implements IResilienceProxy {
                 const exp = this.openExpiration.getTime();
                 if (now > exp) {
                     this.openExpiration = new Date();
-                    this.updateState(CircuitBreakerState.HalfOpen);
+                    this.setState(CircuitBreakerState.HalfOpen);
                     return await this.execute(func);
                 } else {
                     const text = `Circuit Breaker is in open state. Func will be tried again after '${this.openExpiration}'.`;
@@ -132,7 +152,7 @@ export class CircuitBreakerProxy implements IResilienceProxy {
             this.logger.debug(`Func in Circuit Breaker called succesfully.`, null, logFormatter);
             if (wasHalfOpen) {
                 this.bucket.clear();
-                this.updateState(CircuitBreakerState.Close);
+                this.setState(CircuitBreakerState.Close);
             }
         } catch (e) {
             success = false;
@@ -157,21 +177,9 @@ export class CircuitBreakerProxy implements IResilienceProxy {
             expiration.setMilliseconds(expiration.getMilliseconds() + this.breakDurationMs);
             this.openExpiration = expiration;
             this.logger.debug(`Circuit Breaker expiration set to '${expiration}'.`, null, logFormatter);
-            this.updateState(CircuitBreakerState.Open);
+            this.setState(CircuitBreakerState.Open);
         }
 
         return new CircuitBreakerError("An error occured during execution of function in Circuit Breaker", error);
-    }
-
-    /**
-     * Updates the internal state.
-     * @param newState The new state.
-     */
-    private updateState(newState: CircuitBreakerState): void {
-        this.logger.warning(`Circuit Breaker state changed from '${this.state}' to '${newState}'`, null, logFormatter);
-        this.state = newState;
-        if (this.stateChangedCallback) {
-            this.stateChangedCallback(newState);
-        }
     }
 }
