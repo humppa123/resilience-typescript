@@ -204,7 +204,6 @@ Allows a func to fail whithin a configurable timespan configurable times before 
 ![circuitbreaker](./.media/circuitbreaker.png)
 
 ```typescript
-// Arrange
 const breakDuration = TimeSpansInMilliSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
 const maxFailedCalls = 5; // Circuit breaker will go into open state after five failed calls.
 const logger = new NoLogger(); // Empty logger, see Logging chapter.
@@ -216,6 +215,20 @@ try {
 } catch (e) {
     console.log(e.message); // A CircuitBreakerError, its "innerError" contains the real error.
 }
+```
+
+### Baseline
+
+A proxy that calculates an alarm level from a list of func execution durations. Writes warnings to logs if execution duration is above alarm level. Additionaly writes for each func execution statistics of durations on information log level.
+
+```typescript
+const startSamplingAfter = TimeSpansInMilliSeconds.TenMinutes; // A timespan after when sampling should start. Use this if server needs a longer time to start.
+const maxSampleDuration = TimeSpansInMilliSeconds.TenMinutes; // A timespan within samples should be gathered after sampling start. If max sample duration has been reached or if max samples have been reached before, alarm level will be calculated.
+const maxSamplesCount = 100; // The maximum number of samples.
+const logger = new NoLogger(); // Empty logger, see Logging chapter.
+const baseLine = new BaselineProxy(startSamplingAfter, maxSampleDuration, maxSamplesCount, logger);
+const func = async () => {...}; // An async function that does the real work
+const result = await baseLine.execute(func); // Executes the provided func does sampling or checks against alarm level is sampling is finished. Failed calls will be excluded!
 ```
 
 ### Token Cache
@@ -268,6 +281,19 @@ There are also three predefined logger already included:
 * `MultiLogger`: A logger that is a container for other loggers. It will be used if you specify more than one logger in the builders, e.g. a _ConsoleLogger_ and an _AppInsightsLogger_. The multi logger will then forward all messages to its two internal loggers.
 * `NoLogger`: A logger that does nothing, it basically disables all logging.
 * `TestLogger`: A logger that's primary designed for unit tests where you can provide a callback that will be called for each log message, to test if and what log messages are generated.
+
+A example log ouput with a `ConsoleLogger` and `LogLevel.Information` where an endpoint returns three times a response code of 500 and succeeds on the fourth try looks like this:
+
+```bash
+IFORMATION: 2019-10-15 22:58:23.857 d94646ed-d988-91b3-dece-ed36144d5234 start GET 'https://resilience-typescript.azurewebsites.net/api/persons/6'
+ERROR: 2019-10-15 22:58:24.167 d94646ed-d988-91b3-dece-ed36144d5234 Timeout failed with error "Request failed with status code 500"
+WARNING: 2019-10-15 22:58:24.168 d94646ed-d988-91b3-dece-ed36144d5234 Retry 0/30 failed with error "Timeout failed"
+ERROR: 2019-10-15 22:58:24.463 d94646ed-d988-91b3-dece-ed36144d5234 Timeout failed with error "Request failed with status code 500"
+WARNING: 2019-10-15 22:58:24.501 d94646ed-d988-91b3-dece-ed36144d5234 Retry 1/30 failed with error "Timeout failed"
+ERROR: 2019-10-15 22:58:24.830 d94646ed-d988-91b3-dece-ed36144d5234 Timeout failed with error "Request failed with status code 500"
+WARNING: 2019-10-15 22:58:24.833 d94646ed-d988-91b3-dece-ed36144d5234 Retry 2/30 failed with error "Timeout failed"
+INFORMATION: 2019-10-15 22:58:24.928 d94646ed-d988-91b3-dece-ed36144d5234 end 200 in 1070ms
+```
 
 ### Cache
 

@@ -11,6 +11,7 @@ import { MultiLogger } from "./logging/multiLogger";
 import { LogLevel } from "./logging/logLevel";
 import { ConsoleLogger } from "./logging/consoleLogger";
 import { AppInsightsLogger } from "./logging/appInsightsLogger";
+import { BaselineProxy } from "./resilience/baselineProxy";
 
 /**
  * Builder for a resilient pipeline.
@@ -76,6 +77,22 @@ export class ResilientPipelineBuilder {
      * Gets or sets the loggers to use.
      */
     private loggers: Array<ILogger<string>>;
+    /**
+     * Gets or sets a value indicating whether baseline is included.
+     */
+    private baselineIncluded: boolean;
+    /**
+     * Gets or sets a timespan after when sampling should start. Use this if server needs a longer time to start.
+     */
+    private baselineStartSamplingAfter: number;
+    /**
+     * Gets or sets a timespan within samples should be gathered after sampling start.
+     */
+    private baselineMaxSampleDuration: number;
+    /**
+     * Gets or sets the maximum number of samples.
+     */
+    private baselineMaxSamplesCount: number;
 
     /**
      * Initializes a new instance of the @see ResiliencePipelineBuilder class.
@@ -85,6 +102,7 @@ export class ResilientPipelineBuilder {
         this.circuitBreakerIncluded = false;
         this.retryIncluded = false;
         this.timeoutIncluded = false;
+        this.baselineIncluded = false;
         this.loggers = [];
     }
 
@@ -115,6 +133,25 @@ export class ResilientPipelineBuilder {
         }
 
         return logger;
+    }
+
+    /**
+     * Uses baseline measurement and log warning.
+     * @param startSamplingAfter A timespan after when sampling should start. Use this if server needs a longer time to start.
+     * @param maxSampleDuration A timespan within samples should be gathered after sampling start.
+     * @param maxSamplesCount The maximum number of samples.
+     * @returns The builder.
+     */
+    public useBaseline(startSamplingAfter: number, maxSampleDuration: number, maxSamplesCount: number): ResilientPipelineBuilder {
+        Guard.throwIfNullOrNegative(startSamplingAfter, "startSamplingAfter");
+        Guard.throwIfNullOrNegative(maxSampleDuration, "maxSampleDuration");
+        Guard.throwIfNullOrNegative(maxSamplesCount, "maxSamplesCount");
+
+        this.baselineIncluded = true;
+        this.baselineMaxSampleDuration = maxSampleDuration;
+        this.baselineMaxSamplesCount = maxSamplesCount;
+        this.baselineStartSamplingAfter = startSamplingAfter;
+        return this;
     }
 
     /**
@@ -262,6 +299,11 @@ export class ResilientPipelineBuilder {
         const sortedProxies: IResilienceProxy[] = [];
         for (const key of sortedKeys) {
             sortedProxies.push(this.proxies[key]);
+        }
+
+        if (this.baselineIncluded) {
+            const baseline = new BaselineProxy(this.baselineStartSamplingAfter, this.baselineMaxSampleDuration, this.baselineMaxSamplesCount, logger);
+            sortedProxies.push(baseline);
         }
 
         return sortedProxies;

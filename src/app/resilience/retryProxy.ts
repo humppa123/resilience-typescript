@@ -40,12 +40,12 @@ export class RetryProxy implements IResilienceProxy {
         let innerError: Error;
         for (let i = 0; i < this.retries; i++) {
             try {
-                this.logger.trace(guid, `Starting Retry ${i}`, null, logFormatter);
+                this.logger.trace(guid, `Starting Retry ${i}/${this.retries}`, null, logFormatter);
                 const result = await func();
-                this.logger.trace(guid, `Retry ${i} successful`, null, logFormatter);
+                this.logger.trace(guid, `Retry ${i}/${this.retries} successful`, null, logFormatter);
                 return result;
             } catch (error) {
-                this.logger.warning(guid, `Retry ${i} failed`, error, logFormatter);
+                this.logger.warning(guid, `Retry ${i}/${this.retries} failed`, error, logFormatter);
                 innerError = error;
             }
         }

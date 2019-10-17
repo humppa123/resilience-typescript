@@ -4,6 +4,7 @@ import { Guard } from "../utils/guard";
 import axios = require("axios");
 import { IResilienceFactoryProxy } from "../contracts/resilienceFactoryProxy";
 import { CancelToken, Method, AxiosRequestConfig, ResponseType } from "axios";
+import { Guid } from "guid-typescript";
 
 /**
  * An Axios request builder with a pipeline.
@@ -45,6 +46,10 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
      * Gets or sets the response type.
      */
     private responseType?: ResponseType;
+    /**
+     * Gets or sets the request Guid.
+     */
+    private requestGuid?: Guid;
 
     /**
      * Initializes a new instance of the @see AxiosRequestBuilder class.
@@ -57,6 +62,7 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
         this.maxContentLength = 10 * 1024 * 1024; // 10MB
         this.cancelToken = null;
         this.responseType = null;
+        this.requestGuid = null;
         this.params = {};
     }
 
@@ -88,8 +94,17 @@ export class AxiosRequestBuilderWithPipeline implements IResilienceFactoryProxy 
      */
     public async execute<TResult>(cacheKey?: string): Promise<axios.AxiosResponse<TResult>> {
         const request = this.build();
-        const result = await this.pipeline.execute<TResult>(request, cacheKey);
+        const result = await this.pipeline.execute<TResult>(request, cacheKey, this.requestGuid);
         return result;
+    }
+
+    /**
+     * Uses a custom request Guid for request logging.
+     * @param guid Guid to use.
+     */
+    public withRequestGuid(guid: Guid): IResilienceFactoryProxy {
+        this.requestGuid = guid;
+        return this;
     }
 
     /**

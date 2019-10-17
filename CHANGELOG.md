@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.1 - 2019.10.31
+## 2.0.1 - 2019.10.31
 
 This version includes **breaking API changes**
 
@@ -10,6 +10,8 @@ This version includes **breaking API changes**
 * Circuit Breaker has now a leaking bucket algorithm to take note of failures.
 * Maintenance mode added to all pipelines.
 * Added a unique Id to all requests for better logging information.
+* Added a baseline proxy that calculates an alarm level from request duration samples and sends warning messages to a logger if request duration is above this level.
+* Fixed wrong minute timespans
 
 ## 1.2.2 - 2019.09.30
 

@@ -4,7 +4,16 @@ export class TimeSpansInMilliSeconds {
     public static readonly MAXIMUM = Number.MAX_SAFE_INTEGER;
 
     // Milli seconds
-    public static readonly OneHundredMilliSeconds = 100;
+    public static readonly TenMilliSeconds = 10;
+    public static readonly TwentyMilliSeconds = 2 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly ThirtyMilliSeconds = 3 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly FourtyMilliSeconds = 4 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly FiftyMilliSeconds = 5 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly SixtyMilliSeconds = 6 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly SeventyMilliSeconds = 7 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly EightyMilliSeconds = 8 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly NinetyMilliSeconds = 9 * TimeSpansInMilliSeconds.TenMilliSeconds;
+    public static readonly OneHundredMilliSeconds = 10 * TimeSpansInMilliSeconds.TenMilliSeconds;
     public static readonly TwoHundredMilliSeconds = 2 * TimeSpansInMilliSeconds.OneHundredMilliSeconds;
     public static readonly ThreeHundredMilliSeconds = 3 * TimeSpansInMilliSeconds.OneHundredMilliSeconds;
     public static readonly FourHundredMilliSeconds = 4 * TimeSpansInMilliSeconds.OneHundredMilliSeconds;
@@ -29,20 +38,20 @@ export class TimeSpansInMilliSeconds {
     public static readonly FourtySeconds = 40 * TimeSpansInMilliSeconds.OneSecond;
     public static readonly FithtySeconds = 50 * TimeSpansInMilliSeconds.OneSecond;
     // Minutes
-    public static readonly OneMinute = 60 + TimeSpansInMilliSeconds.OneSecond;
-    public static readonly TwoMinutes = 2 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly ThreeMinutes = 3 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly FourMinutes = 4 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly FiveMinutes = 5 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly SixMinutes = 6 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly SevenMinutes = 7 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly EightMinutes = 8 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly NineMinutes = 9 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly TenMinutes = 10 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly TwentyMinutes = 20 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly ThirtyMinutes = 30 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly FourtyMinutes = 40 + TimeSpansInMilliSeconds.OneMinute;
-    public static readonly FithtyMinutes = 50 + TimeSpansInMilliSeconds.OneMinute;
+    public static readonly OneMinute = 60 * TimeSpansInMilliSeconds.OneSecond;
+    public static readonly TwoMinutes = 2 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly ThreeMinutes = 3 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly FourMinutes = 4 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly FiveMinutes = 5 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly SixMinutes = 6 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly SevenMinutes = 7 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly EightMinutes = 8 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly NineMinutes = 9 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly TenMinutes = 10 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly TwentyMinutes = 20 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly ThirtyMinutes = 30 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly FourtyMinutes = 40 * TimeSpansInMilliSeconds.OneMinute;
+    public static readonly FithtyMinutes = 50 * TimeSpansInMilliSeconds.OneMinute;
     // Hours
     public static readonly OneHour = 60 * TimeSpansInMilliSeconds.OneMinute;
     public static readonly TwoHours = 2 * TimeSpansInMilliSeconds.OneHour;
