@@ -55,8 +55,8 @@ export class TimeoutProxy implements IResilienceProxy {
             return v;
         }, (err) => {
             clearTimeout(id);
-            this.logger.error(guid, `Timeout`, err, logFormatter);
-            throw new TimeoutError(`Timeout`, err);
+            this.logger.error(guid, `Timeout failed`, err, logFormatter);
+            throw new TimeoutError(`Timeout failed`, err);
         });
     }
 }

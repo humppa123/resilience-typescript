@@ -1,6 +1,7 @@
 import axios = require("axios");
 import { IAxiosRequestBuilder } from "./axiosRequestBuilder";
 import { CancelToken, ResponseType } from "axios";
+import { Guid } from "guid-typescript";
 
 /**
  * Builder and executor for web requests with a resilient pipeline.
@@ -20,6 +21,12 @@ export interface IResilienceFactoryProxy {
      * @returns The builder.
      */
     addHeader(name: string, value: string): IResilienceFactoryProxy;
+
+    /**
+     * Uses a custom request Guid for request logging.
+     * @param guid Guid to use.
+     */
+    withRequestGuid(guid: Guid): IResilienceFactoryProxy;
 
     /**
      * Adds a request body.

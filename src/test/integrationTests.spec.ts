@@ -19,7 +19,7 @@ describe("Resilence", () => {
         const clientId = "1064ad5e-e258-4793-b423-a786249030fc";
         const clientSecret = "*/eP=0s?v7QXRQR3sSNCJtPi2e=:Mj[l"; // Can be shared as only for integration tests and rate limited!!!
         const tenantId = "dc003016-66b7-4b23-a84d-9a44be793cf0";
-        const logger = new ConsoleLogger(LogLevel.Information);
+        const logger = new NoLogger();
         const tokenProvider: ITokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrlToken, clientId, clientSecret, tenantId, logger);
         const tokenCache = new DefaultTokenCache(tokenProvider, logger);
         const baseUrl = "https://resilience-typescript.azurewebsites.net/api/persons";

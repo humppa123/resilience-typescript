@@ -63,9 +63,10 @@ export class WebPipelineProxy implements IResilienceWebProxy {
      * Sends a web request through the pipeline.
      * @param request Request to send.
      * @param cacheKey Optional cache key.
+     * @param guid Request Guid.
      * @returns Web response.
      */
-    public async execute<TResult>(request: axios.AxiosRequestConfig, cacheKey?: string): Promise<axios.AxiosResponse<TResult>> {
+    public async execute<TResult>(request: axios.AxiosRequestConfig, cacheKey?: string, guid?: Guid): Promise<axios.AxiosResponse<TResult>> {
         Guard.throwIfNullOrEmpty(request, "request");
 
         if (this.itemCache) {
@@ -76,7 +77,10 @@ export class WebPipelineProxy implements IResilienceWebProxy {
             request.baseURL = this.baseUrl;
         }
 
-        const guid = Guid.create();
+        if (!guid) {
+            guid = Guid.create();
+        }
+
         if (this.tokenCache) {
             const token = await this.tokenCache.getToken(guid);
             if (request.headers) {

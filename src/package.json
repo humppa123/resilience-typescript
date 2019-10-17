@@ -1,6 +1,6 @@
 {
   "name": "resilience-typescript",
-  "version": "2.1.0",
+  "version": "2.0.1",
   "description": "resilience-typescript is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
   "keywords": [
     "Resilience",

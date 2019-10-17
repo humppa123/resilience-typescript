@@ -238,6 +238,22 @@ export class ResilientWebPipelineBuilder {
     }
 
     /**
+     * Uses baseline measurement and log warning.
+     * @param startSamplingAfter A timespan after when sampling should start. Use this if server needs a longer time to start.
+     * @param maxSampleDuration A timespan within samples should be gathered after sampling start.
+     * @param maxSamplesCount The maximum number of samples.
+     * @returns The builder.
+     */
+    public useBaseline(startSamplingAfter: number, maxSampleDuration: number, maxSamplesCount: number): ResilientWebPipelineBuilder {
+        Guard.throwIfNullOrNegative(startSamplingAfter, "startSamplingAfter");
+        Guard.throwIfNullOrNegative(maxSampleDuration, "maxSampleDuration");
+        Guard.throwIfNullOrNegative(maxSamplesCount, "maxSamplesCount");
+
+        this.pipelineBuilder.useBaseline(startSamplingAfter, maxSampleDuration, maxSamplesCount);
+        return this;
+    }
+
+    /**
      * Adds a custom logger.
      * @param logger Logger to include.
      * @returns The builder.
