@@ -1,5 +1,4 @@
 import { MemoryCache } from "../caching/memoryCache";
-import { Guard } from "../utils/guard";
 import axios = require("axios");
 import { ICacheMaintenance } from "../contracts/cacheMaintenance";
 

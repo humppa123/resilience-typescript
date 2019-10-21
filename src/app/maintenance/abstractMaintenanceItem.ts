@@ -1,5 +1,4 @@
 import { IResilienceProxy } from "../contracts/resilienceProxy";
-import { Guard } from "../utils/guard";
 
 /**
  * Base class for all maintenace items.

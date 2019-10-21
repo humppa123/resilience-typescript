@@ -6,7 +6,6 @@ import { IResilienceProxy } from "../contracts/resilienceProxy";
 import { ICache } from "../contracts/cache";
 import { ITokenCache } from "../contracts/tokenCache";
 import { IResilienceCrudWebProxy } from "../contracts/resilienceCrudWebProxy";
-import { ConsoleLogger } from "../logging/consoleLogger";
 import { ILogger } from "../contracts/logger";
 import { IMaintance } from "../contracts/maintenance";
 

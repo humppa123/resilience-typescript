@@ -1,5 +1,4 @@
 import axios = require("axios");
-import { IAxiosRequestBuilder } from "./axiosRequestBuilder";
 import { CancelToken, ResponseType } from "axios";
 import { Guid } from "guid-typescript";
 

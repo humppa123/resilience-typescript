@@ -5,7 +5,6 @@ import { ILogger } from "./contracts/logger";
 import { ICache } from "./contracts/cache";
 import axios = require("axios");
 import { MemoryCache } from "./caching/memoryCache";
-import { NoLogger } from "./logging/noLogger";
 import { IResilienceWebProxy } from "./contracts/resilienceWebProxy";
 import { IResilienceProxy } from "./contracts/resilienceProxy";
 import { WebPipelineProxy } from "./pipeline/webPipelineProxy";
@@ -16,15 +15,13 @@ import { DefaultTokenCache } from "./tokenCache/defaultTokenCache";
 import { IResilienceCrudWebProxy } from "./contracts/resilienceCrudWebProxy";
 import { CrudWebPipelineProxy } from "./pipeline/crudWebPipelineProxy";
 import { FactoryWebPipelineProxy } from "./pipeline/factoryWebPipelineProxy";
-import { MultiLogger } from "./logging/multiLogger";
 import { LogLevel } from "./logging/logLevel";
 import { ConsoleLogger } from "./logging/consoleLogger";
 import { AppInsightsLogger } from "./logging/appInsightsLogger";
-import { ICacheMaintenance } from "./contracts/cacheMaintenance";
-import { CacheMaintenance } from "./maintenance/cacheMaintenance.impl";
 import { PipelineProxy } from "./pipeline/pipelineProxy";
 import { Maintenance } from "./maintenance/maintenance.impl";
 import { IMaintance } from "./contracts/maintenance";
+import { TelemetryClient } from "applicationinsights";
 
 /**
  * A builder to create a resilient web pipeline.
@@ -277,10 +274,13 @@ export class ResilientWebPipelineBuilder {
 
     /**
      * Adds an Azure Application Insights logger.
+     * @param client Application Insights client to use.
      * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
      */
-    public useAppInsightsLogger(logLevel?: LogLevel): ResilientWebPipelineBuilder {
-        this.loggers.push(new AppInsightsLogger(logLevel));
+    public useAppInsightsLogger(client: TelemetryClient, logLevel?: LogLevel): ResilientWebPipelineBuilder {
+        Guard.throwIfNullOrEmpty(client, "client");
+
+        this.loggers.push(new AppInsightsLogger(client, logLevel));
 
         return this;
     }
