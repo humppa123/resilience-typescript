@@ -1,4 +1,3 @@
-import { AxiosRequestBuilder } from "../axiosRequestBuilder.impl";
 import { IResilienceWebProxy } from "../contracts/resilienceWebProxy";
 import { Guard } from "../utils/guard";
 import axios = require("axios");

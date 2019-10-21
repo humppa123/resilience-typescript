@@ -1,6 +1,5 @@
 import { ICircuitBreakerMaintenance } from "../contracts/circuitBreakerMaintenance";
 import { IResilienceProxy } from "../contracts/resilienceProxy";
-import { Guard } from "../utils/guard";
 import { CircuitBreakerMaintenance } from "./circuitBreakerMaintenance.impl";
 import { IMaintance } from "../contracts/maintenance";
 import { ICacheMaintenance } from "../contracts/cacheMaintenance";

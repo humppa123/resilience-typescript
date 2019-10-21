@@ -4,6 +4,7 @@ import appInsights = require("applicationinsights");
 import { TraceTelemetry, SeverityLevel } from "applicationinsights/out/Declarations/Contracts";
 import { ArgumentError } from "../utils/argumentError";
 import { Guid } from "guid-typescript";
+import { Guard } from "../utils/guard";
 
 /**
  * Logger that logs to Azure Application Insights
@@ -18,10 +19,11 @@ export class AppInsightsLogger extends AbstractStringLogger {
      * Initializes a new instance of the @see ConsoleLogger class.
      * @param minimumLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
      */
-    constructor(minimumLevel?: LogLevel) {
+    constructor(client: appInsights.TelemetryClient, minimumLevel?: LogLevel, ) {
         super(minimumLevel || LogLevel.Trace);
+        Guard.throwIfNullOrEmpty(client, "client");
 
-        this.client = appInsights.defaultClient;
+        this.client = client;
     }
 
     /**

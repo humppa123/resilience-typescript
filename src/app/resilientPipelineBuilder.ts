@@ -12,6 +12,7 @@ import { LogLevel } from "./logging/logLevel";
 import { ConsoleLogger } from "./logging/consoleLogger";
 import { AppInsightsLogger } from "./logging/appInsightsLogger";
 import { BaselineProxy } from "./resilience/baselineProxy";
+import { TelemetryClient } from "applicationinsights";
 
 /**
  * Builder for a resilient pipeline.
@@ -178,10 +179,13 @@ export class ResilientPipelineBuilder {
 
     /**
      * Adds an Azure Application Insights logger.
+     * @param client Application Insights client to use.
      * @param logLevel The minimum log level this logger accepts for log messages. If not set, LogLevel.Trace will be used.
      */
-    public useAppInsightsLogger(logLevel?: LogLevel): ResilientPipelineBuilder {
-        this.loggers.push(new AppInsightsLogger(logLevel));
+    public useAppInsightsLogger(client: TelemetryClient, logLevel?: LogLevel): ResilientPipelineBuilder {
+        Guard.throwIfNullOrEmpty(client, "client");
+
+        this.loggers.push(new AppInsightsLogger(client, logLevel));
 
         return this;
     }
