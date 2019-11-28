@@ -10,6 +10,7 @@ import { DefaultTokenCache } from "../app/tokenCache/defaultTokenCache";
 import { Person } from "./person";
 import { AxiosRequestConfig } from "axios";
 import { LogLevel } from "../app/logging/logLevel";
+import { TokenProviderError } from "../app/tokenCache/tokenProviderError";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -34,6 +35,16 @@ describe("Resilence", () => {
             // Assert
             expect(result.accessToken).to.not.equal("");
             expect(result.expires).to.not.equal(0);
+        });
+        it("Should throw an error when could not retrieve a proper AAD token", async () => {
+            // Arrange
+            const defectTokenProvider: ITokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrl, clientId, "This is a wrong secret", tenantId, logger);
+
+            // Act
+            const result = async () => await defectTokenProvider.getToken();
+
+            // Assert
+            await expect(result()).to.be.rejectedWith(TokenProviderError);
         });
         it("CRUD list", async () => {
             // Arrange

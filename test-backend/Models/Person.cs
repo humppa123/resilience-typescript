@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace test_backend.Models
+﻿namespace test_backend.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class Person
     {
         [Required]

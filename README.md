@@ -259,6 +259,8 @@ There's been already added a token provider for an Azure Active Directory App Re
 * `tenantId`: The GUID of your Azure Active Directory. You can find this also in the Azure portal.
 * `logger`: An implementation of the `ILogger<TState>` interface. You can find more information in the [Logging](#logging) section.
 
+If no token can be retrieved whith the settings above, a `TokenProviderError` will be thrown.
+
 ```typescript
 const baseUrl = "https://login.microsoftonline.com";
 const clientId = "YOUR_CLIENT_ID";
@@ -370,3 +372,29 @@ const result = queue.push("First"); // Adds a new entry to the queue.
 const hasPoped = result.hasPoped; // Gets a value if a value was removed from the queue due to the size limit of the queue has reached.
 const popedItem = result.popedItem; // Gets the value that was removed from the queue due to the size limit if any.
 ```
+
+## Changelog
+
+[The complete changlog can be found in the CHANGELOG.md file](./CHANGELOG.md)
+
+## Code of conduct
+
+[Discover the code of conduct in the CODE_OF_CONDUCT.md file](./CODE_OF_CONDUCT.md)
+
+## Contributing
+
+[The contributing guidelines can be read in the CONTRIBUTING.md file](./CONTRIBUTING.md)
+
+## License
+
+Unless stated otherwise all works are:
+
+Copyright © 2019+ Fabian Schwarz
+and licensed under:
+
+[MIT License](./LICENSE)
+
+## Buy me a coffee
+
+[If you like this package you can buy me a coffee:](https://www.buymeacoffee.com/humppa123)
+<a href="https://www.buymeacoffee.com/humppa123" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;"/></a>

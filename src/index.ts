@@ -50,6 +50,7 @@ export * from "./app/tokenCache/azureAdAppRegistrationToken";
 export * from "./app/tokenCache/azureAdAppRegistrationTokenProvider";
 export * from "./app/tokenCache/defaultTokenCache";
 export * from "./app/tokenCache/token";
+export * from "./app/tokenCache/tokenProviderError";
 export * from "./app/utils/argumentError";
 export * from "./app/utils/argumentNullError";
 export * from "./app/utils/guard";
