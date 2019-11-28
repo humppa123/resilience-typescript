@@ -1,6 +1,6 @@
 {
   "name": "resilience-typescript",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "resilience-typescript is a Typescript resilience and transient-fault-handling library that allows developers to add components like Timeout, Retry, Circuit Breaker, Cache, Token Cache to outgoing HTTP(S) calls, built on top of the Axios library with a fluent language. Primarly designed for backend service to service communication.",
   "keywords": [
     "Resilience",
@@ -23,6 +23,9 @@
     "type": "git",
     "url": "https://github.com/humppa123/resilience-typescript"
   },
+  "funding": {
+    "url": "https://www.buymeacoffee.com/humppa123"
+  },
   "scripts": {
     "build": "node_modules/.bin/tsc",
     "test": "node_modules/.bin/_mocha \"dist/**/*.spec.js\" --reporter=mocha-multi-reporters --reporter-options configFile=reporter-config.json",
@@ -33,23 +36,23 @@
     "dist": "npm run remove-dist && npm run build-test && npm version patch && npm run copy-package && cd dist && npm run copy-readme && npm publish"
   },
   "dependencies": {
-    "applicationinsights": "^1.4.2",
+    "applicationinsights": "^1.6.0",
     "axios": "^0.19.0",
     "guid-typescript": "^1.0.9",
     "querystring": "^0.2.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.1",
+    "@types/chai": "^4.2.5",
     "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.4",
+    "@types/node": "^12.12.14",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "mocha": "^6.2.0",
+    "mocha": "^6.2.2",
     "mocha-junit-reporter": "^1.23.1",
     "mocha-multi-reporters": "^1.1.7",
-    "tslint": "^5.19.0",
+    "tslint": "^5.20.1",
     "typemoq": "^2.1.0",
-    "typescript": "^3.6.2"
+    "typescript": "^3.7.2"
   }
 }

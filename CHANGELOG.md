@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.4 - 2019.11.27
+
+* Updated all referenced packages
+* Fixed Azure AD Token provider to throw an error if no token could be retrieved
+
 ## 2.0.3 - 2019.10.21
 
 * Fixed again Application Insights logger
