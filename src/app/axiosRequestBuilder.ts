@@ -1,15 +1,12 @@
-import { ResilienceWebProxy } from '../contracts/resilienceWebProxy';
-import { Guard } from '../utils/guard';
-import axios = require('axios');
-import { ResilienceFactoryProxy } from '../contracts/resilienceFactoryProxy';
-import { CancelToken, Method, AxiosRequestConfig, ResponseType } from 'axios';
-import { Guid } from 'guid-typescript';
+import { Method, CancelToken, AxiosRequestConfig, ResponseType } from 'axios';
+import { AxiosWebRequestBuilder } from './contracts/axiosWebRequestBuilder';
+import { Guard } from './utils/guard';
 
 /**
- * An Axios request builder with a pipeline.
+ * An Axios request builder.
  */
-export class AxiosRequestBuilderWithPipeline<TRequestBody>
-  implements ResilienceFactoryProxy<TRequestBody> {
+export class AxiosRequestBuilder<TRequestBody>
+  implements AxiosWebRequestBuilder<TRequestBody> {
   /**
    * Gets the headers dictionary.
    */
@@ -18,10 +15,6 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * Gets the params.
    */
   private readonly params: { [name: string]: string };
-  /**
-   * Gets or sets the pipeline.
-   */
-  private pipeline: ResilienceWebProxy;
   /**
    * Gets or sets the URL.
    */
@@ -46,10 +39,6 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * Gets or sets the response type.
    */
   private responseType?: ResponseType;
-  /**
-   * Gets or sets the request Guid.
-   */
-  private requestId?: Guid;
 
   /**
    * Initializes a new instance of the @see AxiosRequestBuilder class.
@@ -62,7 +51,6 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
     this.maxContentLength = 10 * 1024 * 1024; // 10MB
     this.cancelToken = null;
     this.responseType = null;
-    this.requestId = null;
     this.params = {};
   }
 
@@ -70,49 +58,8 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * Gets a new builder.
    * @returns The builder.
    */
-  static new<TRequestBody>(): AxiosRequestBuilderWithPipeline<TRequestBody> {
-    return new AxiosRequestBuilderWithPipeline();
-  }
-
-  /**
-   * Uses a pipeline.
-   * @param pipeline Pipeline to use.
-   * @returns The builder.
-   */
-  usePipeline(
-    pipeline: ResilienceWebProxy
-  ): AxiosRequestBuilderWithPipeline<TRequestBody> {
-    Guard.throwIfNullOrEmpty(pipeline, 'pipeline');
-
-    this.pipeline = pipeline;
-
-    return this;
-  }
-
-  /**
-   * Sends the request.
-   * @param cacheKey Optional key for the cache.
-   * @returns Web response.
-   */
-  async execute<TResult>(
-    cacheKey?: string
-  ): Promise<axios.AxiosResponse<TResult>> {
-    const request = this.build();
-    const result = await this.pipeline.execute<TResult>(
-      request,
-      cacheKey,
-      this.requestId
-    );
-    return result;
-  }
-
-  /**
-   * Uses a custom request Guid for request logging.
-   * @param requestId Guid to use.
-   */
-  withRequestGuid(requestId: Guid): ResilienceFactoryProxy<TRequestBody> {
-    this.requestId = requestId;
-    return this;
+  static new<TRequestBody>(): AxiosRequestBuilder<TRequestBody> {
+    return new AxiosRequestBuilder();
   }
 
   /**
@@ -121,7 +68,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param value Header value.
    * @returns The builder.
    */
-  addHeader(name: string, value: string): ResilienceFactoryProxy<TRequestBody> {
+  addHeader(name: string, value: string): AxiosRequestBuilder<TRequestBody> {
     this.headers[name] = value;
 
     return this;
@@ -132,7 +79,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param body Request body to add.
    * @returns The builder.
    */
-  withBody(body: TRequestBody): ResilienceFactoryProxy<TRequestBody> {
+  withBody(body: TRequestBody): AxiosRequestBuilder<TRequestBody> {
     this.body = body;
 
     return this;
@@ -143,7 +90,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url URL to use.
    * @returns The builder.
    */
-  withUrl(url: string): ResilienceFactoryProxy<TRequestBody> {
+  withUrl(url: string): AxiosRequestBuilder<TRequestBody> {
     this.url = url;
 
     return this;
@@ -154,7 +101,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param value Maximum content length.
    * @returns The builder.
    */
-  withMaxContentLength(value: number): ResilienceFactoryProxy<TRequestBody> {
+  withMaxContentLength(value: number): AxiosRequestBuilder<TRequestBody> {
     this.maxContentLength = value;
 
     return this;
@@ -165,7 +112,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param value Cancel token to use.
    * @returns The builder.
    */
-  withCancelToken(value: CancelToken): ResilienceFactoryProxy<TRequestBody> {
+  withCancelToken(value: CancelToken): AxiosRequestBuilder<TRequestBody> {
     this.cancelToken = value;
 
     return this;
@@ -176,7 +123,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  delete(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  delete(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'DELETE';
     if (url) {
       this.url = url;
@@ -190,7 +137,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  get(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  get(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'GET';
     if (url) {
       this.url = url;
@@ -204,7 +151,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  head(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  head(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'HEAD';
     if (url) {
       this.url = url;
@@ -218,7 +165,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  options(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  options(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'OPTIONS';
     if (url) {
       this.url = url;
@@ -232,7 +179,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  patch(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  patch(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'PATCH';
     if (url) {
       this.url = url;
@@ -246,7 +193,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  post(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  post(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'POST';
     if (url) {
       this.url = url;
@@ -261,7 +208,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param url Optional URL to use.
    * @returns The builder.
    */
-  put(url: string = null): ResilienceFactoryProxy<TRequestBody> {
+  put(url: string = null): AxiosRequestBuilder<TRequestBody> {
     this.method = 'PUT';
     if (url) {
       this.url = url;
@@ -275,7 +222,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
    * @param value Value to set.
    * @returns The builder.
    */
-  withResponseType(value: ResponseType): ResilienceFactoryProxy<TRequestBody> {
+  withResponseType(value: ResponseType): AxiosRequestBuilder<TRequestBody> {
     this.responseType = value;
 
     return this;
@@ -290,7 +237,7 @@ export class AxiosRequestBuilderWithPipeline<TRequestBody>
   addQueryParameter(
     name: string,
     value: string
-  ): ResilienceFactoryProxy<TRequestBody> {
+  ): AxiosRequestBuilder<TRequestBody> {
     Guard.throwIfNullOrEmpty(name, 'name');
     Guard.throwIfNullOrEmpty(value, 'value');
 

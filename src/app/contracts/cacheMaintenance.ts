@@ -1,9 +1,9 @@
 /**
  * Cache maintenance.
  */
-export interface ICacheMaintenance {
-    /**
-     * Clears the memory cache.
-     */
-    clear(): void;
+export interface CacheMaintenance {
+  /**
+   * Clears the memory cache.
+   */
+  clear(): void;
 }
