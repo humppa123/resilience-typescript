@@ -64,6 +64,11 @@
         {
             PersonsController.FailRandomly();
 
+            if (body == null)
+            {
+                return this.BadRequest();
+            }
+
             if (!this.TryValidateModel(body))
             {
                 return this.BadRequest();
@@ -79,6 +84,11 @@
         public ActionResult<Person> Put(long id, [FromBody] Person body)
         {
             PersonsController.FailRandomly();
+
+            if (body == null)
+            {
+                return this.BadRequest();
+            }
 
             if (!this.TryValidateModel(body))
             {

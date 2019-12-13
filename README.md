@@ -29,9 +29,9 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.tenMinutes, 10, TimeSpansInMilliSeconds.tenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
-    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .useTimeout(3, TimeSpansInMilliSeconds.oneSecond) // All requests will have a timeout before the retry
     .useBaseUrl("https://resilience-typescript.azurewebsites.net/api/persons") // The base URL for our web API
     .buildToCrud<Person>(); // We build to a basic CRUD proxy, safely typed to our person class.
 
@@ -71,9 +71,9 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.tenMinutes, 10, TimeSpansInMilliSeconds.tenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
-    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .useTimeout(3, TimeSpansInMilliSeconds.oneSecond) // All requests will have a timeout before the retry
     .builtToRequestFactory(); // We build to a request factory.
 
 // Now the proxy offers a request factory where all requests will flow through the resilient pipeline like this:
@@ -103,9 +103,9 @@ const proxy = ResilientWebPipelineBuilder
     .New()
     .useConsoleLogger()
     .useAzureAdTokenProvider(...) // Parameters left out for brevity, all requests will use this token cache to authorize against the API and automatically set the 'Authorization'-Header
-    .useCircuitBreaker(1, TimeSpansInMilliSeconds.TenMinutes, 10, TimeSpansInMilliSeconds.TenMinutes) // All requests will go first through a resilient circuit breaker
+    .useCircuitBreaker(1, TimeSpansInMilliSeconds.tenMinutes, 10, TimeSpansInMilliSeconds.tenMinutes) // All requests will go first through a resilient circuit breaker
     .useRetry(2, 10) // All requests will do a retry before the circuit breaker
-    .useTimeout(3, TimeSpansInMilliSeconds.OneSecond) // All requests will have a timeout before the retry
+    .useTimeout(3, TimeSpansInMilliSeconds.oneSecond) // All requests will have a timeout before the retry
     .build(); // We build our basic proxy.
 
 // Now we can send a custom Axios request through the pipeline:
@@ -149,7 +149,7 @@ A pipeline of so called resilience proxies (like Timeout, Retry and Circuit Brea
 ![pipeline](./.media/pipeline.png)
 
 ```typescript
-const proxies: IResilienceProxy[] = [];
+const proxies: ResilienceProxy[] = [];
 // Circuit Breaker calls Retry calls Timeout calls func
 proxies.push(new CircuitBreakerProxy()); // Constructor is missing parameters for demonstration purpose!
 proxies.push(new RetryProxy()); // Constructor is missing parameters for demonstration purpose!
@@ -204,10 +204,10 @@ Allows a func to fail whithin a configurable timespan configurable times before 
 ![circuitbreaker](./.media/circuitbreaker.png)
 
 ```typescript
-const breakDuration = TimeSpansInMilliSeconds.OneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
+const breakDuration = TimeSpansInMilliSeconds.oneMinute; // If circuit breaker state is set to open, subsequent calls will fail fast within the next minute.
 const maxFailedCalls = 5; // Circuit breaker will go into open state after five failed calls.
 const logger = new NoLogger(); // Empty logger, see Logging chapter.
-const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.TenMinutes; // Timespan within errors are counted
+const leakTimeSpanInMilliSeconds = TimeSpansInMilliSeconds.tenMinutes; // Timespan within errors are counted
 const circuitBreaker = new CircuitBreakerProxy(breakDuration, maxFailedCalls, leakTimeSpanInMilliSeconds, logger, null);
 const func = async () => {...}; // An async function that does the real work
 try {
@@ -222,8 +222,8 @@ try {
 A proxy that calculates an alarm level from a list of func execution durations. Writes warnings to logs if execution duration is above alarm level. Additionaly writes for each func execution statistics of durations on information log level.
 
 ```typescript
-const startSamplingAfter = TimeSpansInMilliSeconds.TenMinutes; // A timespan after when sampling should start. Use this if server needs a longer time to start.
-const maxSampleDuration = TimeSpansInMilliSeconds.TenMinutes; // A timespan within samples should be gathered after sampling start. If max sample duration has been reached or if max samples have been reached before, alarm level will be calculated.
+const startSamplingAfter = TimeSpansInMilliSeconds.tenMinutes; // A timespan after when sampling should start. Use this if server needs a longer time to start.
+const maxSampleDuration = TimeSpansInMilliSeconds.tenMinutes; // A timespan within samples should be gathered after sampling start. If max sample duration has been reached or if max samples have been reached before, alarm level will be calculated.
 const maxSamplesCount = 100; // The maximum number of samples.
 const logger = new NoLogger(); // Empty logger, see Logging chapter.
 const baseLine = new BaselineProxy(startSamplingAfter, maxSampleDuration, maxSamplesCount, logger);
@@ -233,13 +233,13 @@ const result = await baseLine.execute(func); // Executes the provided func does 
 
 ### Token Cache
 
-A component that uses an implementation of the `ITokenProvider` interface to request a **Bearer** authorization token. As long as this token does not expire, it will be added automatically to all subsequent web calls `Authorization` header. If the token expires, a new one will be automatically requested. A default implementation is available with the `DefaultTokenCache` class.
+A component that uses an implementation of the `TokenProvider` interface to request a **Bearer** authorization token. As long as this token does not expire, it will be added automatically to all subsequent web calls `Authorization` header. If the token expires, a new one will be automatically requested. A default implementation is available with the `DefaultTokenCache` class.
 
 ![tokenCache](./.media/tokencache.png)
 
-#### ITokenProvider
+#### TokenProvider
 
-You can easily add your own authorization provider, by implementing the `ITokenProvider` provider where you request a token in any format and convert it to the general `Token` class:
+You can easily add your own authorization provider, by implementing the `TokenProvider` provider where you request a token in any format and convert it to the general `Token` class:
 
 ```typescript
     /**
@@ -257,7 +257,7 @@ There's been already added a token provider for an Azure Active Directory App Re
 * `clientId`: The GUID of your app registration. You can find this in the Azure portal.
 * `clientSecret`: A secret you've created for your app registration in the Azure portal.
 * `tenantId`: The GUID of your Azure Active Directory. You can find this also in the Azure portal.
-* `logger`: An implementation of the `ILogger<TState>` interface. You can find more information in the [Logging](#logging) section.
+* `logger`: An implementation of the `Logger<TState>` interface. You can find more information in the [Logging](#logging) section.
 
 If no token can be retrieved whith the settings above, a `TokenProviderError` will be thrown.
 
@@ -266,8 +266,8 @@ const baseUrl = "https://login.microsoftonline.com";
 const clientId = "YOUR_CLIENT_ID";
 const clientSecret = "YOUR_CLIENT_SECRET";
 const tenantId = "YOUR_TENANT_ID";
-const logger: ILogger<string> = new NoLogger();
-const provider: ITokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrl, clientId, clientSecret, tenantId, logger);
+const logger: Logger<string> = new NoLogger();
+const provider: TokenProvider = new AzureActiveDirectoryAppRegistrationTokenProvider(baseUrl, clientId, clientSecret, tenantId, logger);
 
 const result = await provider.getToken(); // A valid token for Bearer authorization that can be used by a token cache.
 ```
@@ -302,7 +302,7 @@ INFORMATION: 2019-10-15 22:58:24.928 d94646ed-d988-91b3-dece-ed36144d5234 end 20
 An interface to provide a caching mechanism to not always query a depended service. A default implementation is provided with the `MemoryCache`. You can easily create your own implementation by implementing the following interface:
 
 ```typescript
-export interface ICache<TKey, TResult> {
+export interface Cache<TKey, TResult> {
     /**
      * Executes a function within a cache. If the value is in the cache and has not expired, it will be returned from the cache, else it will be queried from the func and added to the cache.
      * @param func Function to get the value if not in cache or has expired.
@@ -319,7 +319,7 @@ A default implementation of a cache that stores all values in memory. To minimze
 ![memory](./.media/memorycache.png)
 
 ```typescript
-const expirationTimeSpanMs = TimeSpansInMilliSeconds.OneHour; // Cache entries expire after one hour
+const expirationTimeSpanMs = TimeSpansInMilliSeconds.oneHour; // Cache entries expire after one hour
 const garbageCollectEveryXRequests = 100; // Removing of expired items will take place every 100 calls to the 'execute' function
 const maxEntryCount = 500; // Cache holds 500 entries maximum. If more are added, the oldest will be removed.
 const key = "KeyForFunc"; // The key for the result of the func. Must be provided.
@@ -340,7 +340,7 @@ An interface to provide a queue in TypeScript, it is used in the `MemoryCache` t
 /**
  * A queue with a defined maximum lenght.
  */
-export interface IQueue<T> {
+export interface Queue<T> {
     /**
      * The maximum length of the queue.
      */

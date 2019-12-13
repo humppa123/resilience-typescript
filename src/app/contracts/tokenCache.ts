@@ -1,13 +1,13 @@
-import { Token } from "../tokenCache/token";
-import { Guid } from "guid-typescript";
+import { Token } from '../tokenCache/token';
+import { Guid } from 'guid-typescript';
 
 /**
  * A token cache.
  */
-export interface ITokenCache {
-    /**
-     * Gets an access token.
-     * @param guid Request Guid.
-     */
-    getToken(guid?: Guid): Promise<Token>;
+export interface TokenCache {
+  /**
+   * Gets an access token.
+   * @param requestId Request Guid.
+   */
+  getToken(requestId?: Guid): Promise<Token>;
 }

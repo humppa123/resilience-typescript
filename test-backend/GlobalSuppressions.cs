@@ -1,0 +1,2 @@
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Too many static methods", Scope = "namespaceanddescendants", Target = "test_backend")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Bezeichner dürfen keine Unterstriche enthalten", Justification = "", Scope = "namespaceanddescendants", Target = "test_backend")]
