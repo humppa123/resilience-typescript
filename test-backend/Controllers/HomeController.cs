@@ -3,7 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
 
     [ApiController]
-    public class HomeController : ControllerBase
+    public sealed class HomeController : ControllerBase
     {
         [HttpGet("/favicon.ico")]
         public IActionResult Favicon()
