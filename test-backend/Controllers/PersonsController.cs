@@ -11,7 +11,7 @@
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
-    public class PersonsController : ControllerBase
+    public sealed class PersonsController : ControllerBase
     {
         private static readonly IList<Person> TestData = new List<Person>
         {

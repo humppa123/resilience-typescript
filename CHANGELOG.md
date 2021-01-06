@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 - 2021.01.06
+
+- Bumped versions of referenced packages
+
 ## 3.0.1 - 2019.12.16
 
 - Bumped version to 3.0.1 as 2.0.5 included breaking changes.

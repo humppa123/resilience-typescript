@@ -2,7 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class Person
+    public sealed class Person
     {
         [Required]
         public string FirstName { get; set; }
