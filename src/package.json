@@ -18,7 +18,7 @@
   "bugs": "https://github.com/humppa123/resilience-typescript/issues",
   "license": "MIT",
   "author": "Fabian Schwarz",
-  "main": "index.ts",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/humppa123/resilience-typescript"
